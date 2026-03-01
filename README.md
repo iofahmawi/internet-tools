@@ -23,15 +23,6 @@
 - JavaScript (Vanilla JS)
 - خط [Tajawal](https://fonts.google.com/specimen/Tajawal) من Google Fonts
 
-## 📦 التشغيل المحلي
-
-```bash
-git clone https://github.com/iofahmawi/internet-calculator.git
-cd internet-calculator
-```
-
-ثم افتح ملف `index.html` مباشرة في المتصفح — لا يحتاج إلى سيرفر أو أي تبعيات.
-
 ## 📊 آلية الحساب
 
 | الجهاز | السرعة المقدّرة |
