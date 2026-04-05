@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>حاسبة السرعة</title>
+    <title>أدوات الإنترنت</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <style>
         :root {
             --primary-gradient: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
@@ -16,43 +17,187 @@
             --border-color: #cbd5e1;
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+
         body {
             font-family: 'Tajawal', sans-serif;
             background-color: var(--bg-page);
             color: var(--text-main);
-            margin: 0;
-            display: block; 
-            padding-top: 22px;
-            padding-bottom: 50px; 
-            padding-left: 10px;
-            padding-right: 10px;
             min-height: 100vh;
+            overflow-x: hidden;
         }
 
+        /* ========== CARD HEADER ROW ========== */
+        .card-header {
+            display: flex;
+            flex-direction: row;
+            align-items: stretch;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            min-height: 36px;
+        }
+        .card-header h1 {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #111827;
+            margin: 0;
+            padding: 0;
+            flex: 1;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+        .header-spacer { width: 36px; flex-shrink: 0; }
+
+        .menu-btn {
+            width: 36px;
+            height: 36px;
+            background: #f1f5f9;
+            border: none;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            cursor: pointer;
+            padding: 0;
+            flex-shrink: 0;
+            transition: background 0.2s;
+            position: relative;
+            top: -5px;
+        }
+        .menu-btn:active { background: #e2e8f0; }
+        .menu-btn span {
+            display: block;
+            width: 16px;
+            height: 2px;
+            background: var(--accent-color);
+            border-radius: 2px;
+        }
+
+        /* ========== SIDEBAR ========== */
+        .sidebar-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 200;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        .sidebar-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            right: -280px;
+            width: 280px;
+            height: 100%;
+            background: white;
+            z-index: 201;
+            transition: right 0.3s cubic-bezier(0.4,0,0.2,1);
+            display: flex;
+            flex-direction: column;
+            box-shadow: -4px 0 20px rgba(0,0,0,0.15);
+        }
+        .sidebar.open { right: 0; }
+
+        .sidebar-header {
+            background: var(--primary-gradient);
+            padding: 50px 20px 20px;
+            color: white;
+        }
+        .sidebar-header .app-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+        .sidebar-header h2 { font-size: 1.1rem; font-weight: 800; }
+        .sidebar-header p { font-size: 0.8rem; opacity: 0.8; margin-top: 3px; }
+
+        .sidebar-nav { padding: 12px 10px; flex: 1; }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 13px 14px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-bottom: 4px;
+            border: none;
+            background: transparent;
+            width: 100%;
+            text-align: right;
+            font-family: 'Tajawal', sans-serif;
+        }
+        .nav-item:active { background: #f1f5f9; }
+        .nav-item.active-nav {
+            background: #eef2ff;
+        }
+
+        .nav-item-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            color: var(--text-secondary);
+        }
+        .nav-item.active-nav .nav-item-icon {
+            background: var(--accent-color);
+            color: white;
+        }
+        .nav-item-text { flex: 1; }
+        .nav-item-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-main);
+            display: block;
+        }
+        .nav-item.active-nav .nav-item-title { color: var(--accent-color); }
+        .nav-item-subtitle {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            display: block;
+            margin-top: 2px;
+        }
+
+        .nav-divider {
+            height: 1px;
+            background: #f1f5f9;
+            margin: 8px 14px;
+        }
+
+        /* ========== PAGES ========== */
+        .page { display: none; padding: 22px 10px 50px; }
+        .page.active { display: block; }
+
+        /* ========== SPEED CALCULATOR ========== */
         .main-container {
             background-color: var(--bg-card);
             width: 100%;
             max-width: 480px;
-            margin: 0 auto;
-            margin-bottom: 30px;
+            margin: 0 auto 30px;
             border-radius: 24px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-            padding: 25px 25px 30px 25px;
+            padding: 25px 25px 30px;
             position: relative;
-        }
-
-        header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        h1 {
-            font-size: 1.4rem;
-            font-weight: 800;
-            color: #111827;
-            margin: 0;
         }
 
         .section-title {
@@ -64,7 +209,6 @@
             align-items: center;
             gap: 10px;
         }
-        
         .section-title::after {
             content: '';
             flex: 1;
@@ -81,14 +225,10 @@
         }
         .device-row:last-of-type { border-bottom: none; }
 
-        .device-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
+        .device-info { display: flex; align-items: center; gap: 12px; }
 
         .icon-box {
-            width: 38px; 
+            width: 38px;
             height: 38px;
             background: #eef2ff;
             border-radius: 10px;
@@ -96,15 +236,11 @@
             align-items: center;
             justify-content: center;
             color: var(--accent-color);
-            flex-shrink: 0; 
+            flex-shrink: 0;
         }
         .icon-box svg { width: 20px; height: 20px; }
 
-        .device-name {
-            font-weight: 700;
-            font-size: 0.95rem;
-            color: #374151;
-        }
+        .device-name { font-weight: 700; font-size: 0.95rem; color: #374151; }
 
         .stepper {
             background-color: transparent;
@@ -113,8 +249,8 @@
             display: flex;
             align-items: flex-start;
             justify-content: space-between;
-            width: 100px; 
-            height: 32px; 
+            width: 100px;
+            height: 32px;
             padding: 0;
             overflow: hidden;
         }
@@ -129,18 +265,15 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.1rem; 
+            font-size: 1.1rem;
             font-weight: 500;
             cursor: pointer;
             flex-shrink: 0;
             line-height: 1;
             padding: 0;
-            padding-top: 2px; 
+            padding-top: 2px;
         }
-
-        .stepper-btn:active { 
-            background-color: #f1f5f9; 
-        }
+        .stepper-btn:active { background-color: #f1f5f9; }
 
         .stepper-value {
             flex: 1;
@@ -156,40 +289,32 @@
             outline: none;
             font-family: 'Tajawal', sans-serif;
             padding: 0;
-            padding-top: 6px; 
+            padding-top: 6px;
             line-height: normal;
         }
 
         .action-btn {
-            display: block; 
+            display: block;
             width: 70%;
-            max-width: 280px; 
-            margin: 25px auto 5px auto;
+            max-width: 280px;
+            margin: 25px auto 5px;
             background: var(--primary-gradient);
             color: white;
             border: none;
-            padding: 10px 20px; 
-            font-size: 1rem; 
+            padding: 10px 20px;
+            font-size: 1rem;
             font-weight: 700;
-            border-radius: 50px; 
+            border-radius: 50px;
             cursor: pointer;
-            box-shadow: none; 
             transition: transform 0.2s, opacity 0.2s;
+            font-family: 'Tajawal', sans-serif;
         }
-        
-        .action-btn:hover {
-            opacity: 0.9;
-            transform: translateY(-1px);
-        }
-        
-        .action-btn:active { 
-            transform: translateY(1px);
-        }
+        .action-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+        .action-btn:active { transform: translateY(1px); }
 
-        /* --- ضبط المسافات في النتيجة --- */
         .result-panel {
             margin-top: 25px;
-            padding: 30px 20px; /* زيادة البادينغ قليلاً */
+            padding: 30px 20px;
             background: linear-gradient(to bottom, #ffffff, #f8fafc);
             border: 2px solid #eef2ff;
             border-radius: 20px;
@@ -197,23 +322,17 @@
             display: none;
             flex-direction: column;
             align-items: center;
-            /* تقليل الفراغ العام لأننا سنضبطه يدوياً لكل عنصر */
-            gap: 10px; 
+            gap: 10px;
         }
 
-        .result-label {
-            font-size: 0.95rem;
-            color: var(--text-secondary);
-            margin: 0;
-            margin-bottom: 15px; /* مسافة بسيطة تحت العنوان */
-        }
+        .result-label { font-size: 0.95rem; color: var(--text-secondary); margin: 0; margin-bottom: 15px; }
 
         .speed-display {
-            font-size: 3.2rem; /* تكبير الخط قليلاً */
+            font-size: 3.2rem;
             font-weight: 800;
             line-height: 1;
             margin: 0;
-            margin-bottom: 6px; /* مسافة واضحة بين الرقم والكبسولة */
+            margin-bottom: 6px;
             background: var(--primary-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -228,40 +347,246 @@
             color: var(--text-secondary);
             display: inline-flex;
             justify-content: center;
-            padding-top: 9px;
-            padding-bottom: 5px; 
-            padding-left: 16px;
-            padding-right: 16px;
-            line-height: normal; 
+            padding: 9px 16px 5px;
+            line-height: normal;
             gap: 5px;
             white-space: nowrap;
-            /* لا يوجد مارجن هنا لأن الفراغ يتم التحكم به من العنصر الذي فوقه وتحته */
         }
-
-        .result-details b {
-            position: relative;
-            top: 1px; 
-        }
+        .result-details b { position: relative; top: 1px; }
 
         .rec-text {
             font-size: 1rem;
             color: #1e293b;
             font-weight: 600;
             margin: 0;
-            margin-top: 11px; /* مسافة كبيرة نسبياً لفصل النصيحة عن الكبسولة */
+            margin-top: 11px;
             line-height: 1.5;
         }
+
+        /* ========== CONSUMPTION CALCULATOR ========== */
+        .cons-card {
+            background: var(--bg-card);
+            border-radius: 24px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+            max-width: 480px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cons-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px 20px;
+            margin-bottom: 18px;
+        }
+
+        .cons-group { position: relative; }
+        .cons-label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #374151;
+            text-align: center;
+        }
+
+        .cons-input-wrap { position: relative; width: 100%; }
+        .cons-input-wrap::after {
+            content: "";
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            border-left: 4px solid transparent;
+            border-right: 4px solid transparent;
+            border-top: 5px solid #999;
+            pointer-events: none;
+        }
+
+        .cons-input {
+            width: 100%;
+            border: 1.5px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 1rem;
+            text-align: center;
+            outline: none;
+            background-color: #fff;
+            display: block;
+            appearance: none;
+            -webkit-appearance: none;
+            font-family: 'Tajawal', sans-serif;
+            color: var(--text-main);
+            font-weight: 500;
+            padding: 14px 10px 8px 35px;
+            line-height: normal;
+            transition: border-color 0.2s;
+        }
+        .cons-input[type="number"] { padding: 14px 10px 8px; }
+        .cons-input:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(79,70,229,0.1);
+        }
+
+        .cons-full { grid-column: 1 / -1; }
+
+        .cons-btn {
+            display: block;
+            width: 70%;
+            max-width: 280px;
+            margin: 8px auto 0;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            padding: 11px 20px;
+            font-size: 1rem;
+            font-weight: 700;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: 'Tajawal', sans-serif;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+        .cons-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+        .cons-btn:active { transform: translateY(1px); }
+        .cons-btn { margin-top: 28px; }
+
+        .cons-result {
+            display: none;
+            max-width: 480px;
+            margin: 0 auto;
+            background: var(--bg-card);
+            border-radius: 24px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            border-top: 4px solid var(--accent-color);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .cons-main-result {
+            text-align: center;
+            margin-bottom: 18px;
+            padding: 18px 15px;
+            background: #eef2ff;
+            border-radius: 14px;
+        }
+        .cons-main-label {
+            display: block;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+        }
+        .cons-main-value {
+            display: block;
+            color: var(--accent-color);
+            font-size: 2rem;
+            font-weight: 800;
+            direction: ltr;
+        }
+
+        .cons-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .cons-stat-item {
+            background: #f8fafc;
+            padding: 14px 12px;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+            text-align: center;
+        }
+        .cons-stat-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            display: block;
+            margin-bottom: 8px;
+        }
+        .cons-stat-value {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            direction: ltr;
+            display: block;
+        }
+        #daysPassed { direction: rtl; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* flatpickr overrides */
+        .flatpickr-calendar { font-family: 'Tajawal', sans-serif !important; }
     </style>
 </head>
 <body>
 
+<!-- Sidebar Overlay -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<!-- Sidebar -->
+<nav class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <div class="app-icon">
+            <svg width="26" height="26" fill="none" stroke="white" stroke-width="2.2" viewBox="0 0 24 24">
+                <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
+                <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
+                <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+                <line x1="12" y1="20" x2="12.01" y2="20"></line>
+            </svg>
+        </div>
+        <h2>أدوات الإنترنت</h2>
+        <p>حاسبات سرعة واستهلاك الإنترنت</p>
+    </div>
+
+    <div class="sidebar-nav">
+        <button class="nav-item active-nav" id="nav-consumption" onclick="navigateTo('consumption')">
+            <div class="nav-item-icon">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <line x1="18" y1="20" x2="18" y2="10"></line>
+                    <line x1="12" y1="20" x2="12" y2="4"></line>
+                    <line x1="6" y1="20" x2="6" y2="14"></line>
+                </svg>
+            </div>
+            <div class="nav-item-text">
+                <span class="nav-item-title">معدل الاستهلاك</span>
+                <span class="nav-item-subtitle">تتبع استهلاكك اليومي</span>
+            </div>
+        </button>
+
+        <div class="nav-divider"></div>
+
+        <button class="nav-item" id="nav-speed" onclick="navigateTo('speed')">
+            <div class="nav-item-icon">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+                </svg>
+            </div>
+            <div class="nav-item-text">
+                <span class="nav-item-title">حاسبة السرعة</span>
+                <span class="nav-item-subtitle">السرعة المناسبة لاشتراكك</span>
+            </div>
+        </button>
+    </div>
+</nav>
+
+<!-- ===================== PAGE: SPEED CALCULATOR ===================== -->
+<div id="page-speed" class="page">
+
     <div class="main-container">
-        <header>
+
+        <div class="card-header">
+            <div class="header-spacer"></div>
             <h1>حاسبة السرعة</h1>
-        </header>
+            <button class="menu-btn" onclick="openSidebar()"><span></span><span></span><span></span></button>
+        </div>
 
         <div class="section-title">الشاشات والمشاهدة</div>
-        
+
         <div class="device-row">
             <div class="device-info">
                 <div class="icon-box">
@@ -355,7 +680,12 @@
 
         <div class="device-row">
             <div class="device-info">
-                <div class="icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 12h4m4 0h4m-10-4h4m-2-2v4"></path><rect x="2" y="6" width="20" height="12" rx="2"></rect></svg></div>
+                <div class="icon-box">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 12h4m4 0h4m-10-4h4m-2-2v4"></path>
+                        <rect x="2" y="6" width="20" height="12" rx="2"></rect>
+                    </svg>
+                </div>
                 <span class="device-name">كونسول (PS/Xbox)</span>
             </div>
             <div class="stepper">
@@ -367,7 +697,11 @@
 
         <div class="device-row">
             <div class="device-info">
-                <div class="icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path></svg></div>
+                <div class="icon-box">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
+                    </svg>
+                </div>
                 <span class="device-name">ألعاب سحابية</span>
             </div>
             <div class="stepper">
@@ -381,95 +715,228 @@
 
         <div id="result" class="result-panel">
             <div class="result-label">الحد الأدنى للسرعة:</div>
-            
             <div class="speed-display" id="speedOutput">0 Mbps</div>
-            
             <div class="result-details" id="fullSpeedText"></div>
-            
             <div class="rec-text" id="recommendationText"></div>
         </div>
-        
-        <div style="height: 1px;"></div>
 
+        <div style="height: 1px;"></div>
+    </div>
+</div>
+
+<!-- ===================== PAGE: CONSUMPTION RATE ===================== -->
+<div id="page-consumption" class="page active">
+
+    <div class="cons-card">
+        <div class="card-header">
+            <div class="header-spacer"></div>
+            <h1>معدل الاستهلاك</h1>
+            <button class="menu-btn" onclick="openSidebar()"><span></span><span></span><span></span></button>
+        </div>
+        <div class="cons-row">
+            <div class="cons-group">
+                <label class="cons-label">سعة الاشتراك (GB)</label>
+                <input class="cons-input" type="number" id="capacity">
+            </div>
+            <div class="cons-group">
+                <label class="cons-label">المتبقي حالياً (GB)</label>
+                <input class="cons-input" type="number" id="remaining">
+            </div>
+        </div>
+
+        <div class="cons-row">
+            <div class="cons-group">
+                <label class="cons-label">تاريخ البداية</label>
+                <div class="cons-input-wrap">
+                    <input class="cons-input" type="text" id="startDate" readonly>
+                </div>
+            </div>
+            <div class="cons-group">
+                <label class="cons-label">وقت البداية</label>
+                <div class="cons-input-wrap">
+                    <input class="cons-input" type="text" id="startTime" readonly>
+                </div>
+            </div>
+        </div>
+
+        <div class="cons-row" style="margin-bottom: 0;">
+            <div class="cons-group cons-full">
+                <label class="cons-label">تاريخ انتهاء الاشتراك</label>
+                <div class="cons-input-wrap">
+                    <input class="cons-input" type="text" id="endDate" readonly>
+                </div>
+            </div>
+        </div>
+
+        <button class="cons-btn" onclick="calculateConsumption()">احسب المعدل</button>
     </div>
 
-    <script>
-        function updateValue(id, change) {
-            let input = document.getElementById(id);
-            let val = parseInt(input.value) || 0;
-            let newVal = val + change;
-            if (newVal < 0) newVal = 0;
-            input.value = newVal;
+    <div class="cons-result" id="consResult">
+        <div class="cons-main-result">
+            <span class="cons-main-label">معدل الاستهلاك اليومي:</span>
+            <span class="cons-main-value" id="actualDailyRate"></span>
+        </div>
+        <div class="cons-stats">
+            <div class="cons-stat-item">
+                <span class="cons-stat-label">الأيام المنقضية</span>
+                <span class="cons-stat-value" id="daysPassed"></span>
+            </div>
+            <div class="cons-stat-item">
+                <span class="cons-stat-label">المعدل الآمن للمتبقي</span>
+                <span class="cons-stat-value" id="safeRate"></span>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+    // ========== SIDEBAR ==========
+    function openSidebar() {
+        document.getElementById('sidebar').classList.add('open');
+        document.getElementById('sidebarOverlay').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeSidebar() {
+        document.getElementById('sidebar').classList.remove('open');
+        document.getElementById('sidebarOverlay').classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    function navigateTo(page) {
+        // Hide all pages
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active-nav'));
+
+        // Show target page
+        document.getElementById('page-' + page).classList.add('active');
+        document.getElementById('nav-' + page).classList.add('active-nav');
+
+        closeSidebar();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ========== SPEED CALCULATOR ==========
+    function updateValue(id, change) {
+        let input = document.getElementById(id);
+        let val = parseInt(input.value) || 0;
+        let newVal = val + change;
+        if (newVal < 0) newVal = 0;
+        input.value = newVal;
+    }
+
+    function calculateSpeed() {
+        const SPEED_RATES = {
+            tv4k: 40, tvFhd: 15, mobileHigh: 25,
+            mobileNormal: 12, laptops: 10, consoles: 10, cloudGaming: 30
+        };
+
+        let tv4k        = parseInt(document.getElementById('tv4k').value) || 0;
+        let tvFhd       = parseInt(document.getElementById('tvFhd').value) || 0;
+        let mobileHigh  = parseInt(document.getElementById('mobileHigh').value) || 0;
+        let mobileNormal= parseInt(document.getElementById('mobileNormal').value) || 0;
+        let laptops     = parseInt(document.getElementById('laptops').value) || 0;
+        let consoles    = parseInt(document.getElementById('consoles').value) || 0;
+        let cloudGaming = parseInt(document.getElementById('cloudGaming').value) || 0;
+
+        let rawTotal = (tv4k * SPEED_RATES.tv4k) + (tvFhd * SPEED_RATES.tvFhd) +
+                       (mobileHigh * SPEED_RATES.mobileHigh) + (mobileNormal * SPEED_RATES.mobileNormal) +
+                       (laptops * SPEED_RATES.laptops) + (consoles * SPEED_RATES.consoles) +
+                       (cloudGaming * SPEED_RATES.cloudGaming);
+
+        let peakTotal = Math.ceil(rawTotal * 1.1);
+        let resBox = document.getElementById('result');
+        let capsule = document.getElementById('fullSpeedText');
+
+        resBox.style.display = 'flex';
+        document.getElementById('speedOutput').innerText = rawTotal + " Mbps";
+
+        if (rawTotal > 0) {
+            capsule.style.display = 'inline-flex';
+            capsule.innerHTML = "ربما تحتاج في أوقات الذروة سرعة <b dir='ltr'>" + peakTotal + " Mbps</b>";
+        } else {
+            capsule.style.display = 'none';
+            capsule.innerHTML = "";
         }
 
-        function calculateSpeed() {
-            const SPEED_RATES = {
-                tv4k: 40,         
-                tvFhd: 15,        
-                mobileHigh: 25,   
-                mobileNormal: 12,  
-                laptops: 10,       
-                consoles: 10,      
-                cloudGaming: 30   
-            };
-
-            let tv4k = parseInt(document.getElementById('tv4k').value) || 0;
-            let tvFhd = parseInt(document.getElementById('tvFhd').value) || 0;
-            let mobileHigh = parseInt(document.getElementById('mobileHigh').value) || 0;
-            let mobileNormal = parseInt(document.getElementById('mobileNormal').value) || 0;
-            let laptops = parseInt(document.getElementById('laptops').value) || 0;
-            let consoles = parseInt(document.getElementById('consoles').value) || 0;
-            let cloudGaming = parseInt(document.getElementById('cloudGaming').value) || 0;
-
-            // 1. الحساب الخام
-            let rawTotal = (tv4k * SPEED_RATES.tv4k) + 
-                           (tvFhd * SPEED_RATES.tvFhd) + 
-                           (mobileHigh * SPEED_RATES.mobileHigh) + 
-                           (mobileNormal * SPEED_RATES.mobileNormal) + 
-                           (laptops * SPEED_RATES.laptops) + 
-                           (consoles * SPEED_RATES.consoles) + 
-                           (cloudGaming * SPEED_RATES.cloudGaming);
-
-            // 2. حساب الذروة
-            let peakTotal = Math.ceil(rawTotal * 1.1);
-
-            let resBox = document.getElementById('result');
-            let capsule = document.getElementById('fullSpeedText');
-            
-            resBox.style.display = 'flex';
-
-            // عرض الرقم الحقيقي الخام
-            document.getElementById('speedOutput').innerText = rawTotal + " Mbps";
-            
-            // الكبسولة تعرض رقم الذروة (إخفاؤها إذا كانت النتيجة صفر)
-            if(rawTotal > 0) {
-                 capsule.style.display = 'inline-flex';
-                 capsule.innerHTML = "ربما تحتاج في أوقات الذروة سرعة <b dir='ltr'>" + peakTotal + " Mbps</b>";
-            } else {
-                 capsule.style.display = 'none';
-                 capsule.innerHTML = "";
-            }
-
-            // النصيحة بناءً على رقم الذروة
-            let rec = "";
-            if (rawTotal === 0) {
-                rec = "يرجى اختيار الأجهزة أولاً.";
-            } else if (peakTotal <= 100) {
-                rec = "ننصحك بالاشتراك في سرعة <b>100 ميجا</b>.";
-            } else if (peakTotal <= 200) {
-                rec = "ننصحك بالاشتراك في سرعة <b>200 ميجا</b>.";
-            } else if (peakTotal <= 300) {
-                rec = "ننصحك بالاشتراك في سرعة <b>300 ميجا</b>.";
-            } else {
-                rec = "ننصحك بالاشتراك في سرعة <b>500 ميجا</b> أو أعلى.";
-            }
-
-            document.getElementById('recommendationText').innerHTML = rec;
-            
-            setTimeout(() => {
-                resBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, 100);
+        let rec = "";
+        if (rawTotal === 0) {
+            rec = "يرجى اختيار الأجهزة أولاً.";
+        } else if (peakTotal <= 100) {
+            rec = "ننصحك بالاشتراك في سرعة <b>100 ميجا</b>.";
+        } else if (peakTotal <= 200) {
+            rec = "ننصحك بالاشتراك في سرعة <b>200 ميجا</b>.";
+        } else if (peakTotal <= 300) {
+            rec = "ننصحك بالاشتراك في سرعة <b>300 ميجا</b>.";
+        } else {
+            rec = "ننصحك بالاشتراك في سرعة <b>500 ميجا</b> أو أعلى.";
         }
-    </script>
+
+        document.getElementById('recommendationText').innerHTML = rec;
+        setTimeout(() => { resBox.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+    }
+
+    // ========== CONSUMPTION CALCULATOR ==========
+    const dateConfig = { dateFormat: "Y-m-d" };
+    const datePicker    = flatpickr("#startDate", dateConfig);
+    const endDatePicker = flatpickr("#endDate", dateConfig);
+    const timePicker    = flatpickr("#startTime", { enableTime: true, noCalendar: true, dateFormat: "H:i", time_24hr: true });
+
+    window.addEventListener('load', function() {
+        const fields = ['capacity', 'remaining', 'startDate', 'startTime', 'endDate'];
+        fields.forEach(id => {
+            const val = localStorage.getItem('cons_' + id);
+            if (val) {
+                document.getElementById(id).value = val;
+                if (id === 'startDate') datePicker.setDate(val);
+                if (id === 'endDate')   endDatePicker.setDate(val);
+                if (id === 'startTime') timePicker.setDate(val);
+            }
+        });
+    });
+
+    function calculateConsumption() {
+        const capInput      = document.getElementById('capacity').value;
+        const remInput      = document.getElementById('remaining').value;
+        const startDateVal  = document.getElementById('startDate').value;
+        const startTimeVal  = document.getElementById('startTime').value;
+        const endDateVal    = document.getElementById('endDate').value;
+
+        if (!capInput || isNaN(parseFloat(remInput)) || !startDateVal || !startTimeVal || !endDateVal) {
+            alert("يرجى ملء كافة الخانات"); return;
+        }
+
+        localStorage.setItem('cons_capacity',  capInput);
+        localStorage.setItem('cons_remaining', remInput);
+        localStorage.setItem('cons_startDate', startDateVal);
+        localStorage.setItem('cons_startTime', startTimeVal);
+        localStorage.setItem('cons_endDate',   endDateVal);
+
+        const start = new Date(`${startDateVal}T${startTimeVal}`);
+        const end   = new Date(`${endDateVal}T23:59:59`);
+        const now   = new Date();
+
+        if (now < start) { alert("تاريخ البداية يجب أن يكون في الماضي"); return; }
+        if (end <= now)  { alert("تاريخ الانتهاء يجب أن يكون في المستقبل"); return; }
+
+        const cap       = parseFloat(capInput);
+        const rem       = parseFloat(remInput);
+        const consumed  = cap - rem;
+        const daysPassed = (now - start) / (1000 * 60 * 60 * 24);
+        const daysLeft   = (end - now)   / (1000 * 60 * 60 * 24);
+
+        const actualDailyRate = consumed / daysPassed;
+        const safeRate        = rem / daysLeft;
+
+        document.getElementById('actualDailyRate').innerText = actualDailyRate.toFixed(2) + " GB";
+        document.getElementById('daysPassed').innerText      = daysPassed.toFixed(1);
+        document.getElementById('safeRate').innerText        = safeRate.toFixed(2) + " GB";
+
+        const resultEl = document.getElementById('consResult');
+        resultEl.style.display = 'block';
+    }
+</script>
 </body>
 </html>
