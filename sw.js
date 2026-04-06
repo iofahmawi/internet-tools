@@ -1,4 +1,4 @@
-const CACHE_NAME = 'internet-tools-v1';
+const CACHE_NAME = 'internet-tools-v2';
 const ASSETS = [
   '/index.html',
   '/manifest.json',

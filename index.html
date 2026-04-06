@@ -192,7 +192,7 @@
         }
 
         /* ========== PAGES ========== */
-        .page { display: none; padding: calc(0.2cm + 22px) 10px 50px; }
+        .page { display: none; padding: 0.6cm 10px 50px; }
         .page.active { display: block; }
 
         /* ========== SPEED CALCULATOR ========== */
@@ -528,6 +528,10 @@
 
         /* flatpickr overrides */
         .flatpickr-calendar { font-family: 'Tajawal', sans-serif !important; }
+
+        @media (display-mode: standalone) {
+            .page { padding-top: 0.7cm; }
+        }
     </style>
 </head>
 <body>
