@@ -1,4 +1,4 @@
-const CACHE_NAME = 'internet-tools-v4';
+const CACHE_NAME = 'internet-tools-v5';
 const ASSETS = [
     './',
     './index.html',
