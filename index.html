@@ -519,7 +519,7 @@
             direction: ltr;
             display: block;
         }
-        #daysPassed { direction: rtl; }
+        #daysPassed { direction: rtl; font-size: 0.93rem; }
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
@@ -986,8 +986,19 @@
         const actualDailyRate = consumed / daysPassed;
         const safeRate        = Math.min(rem / daysLeft, rem);
 
+        const totalMinutes = Math.floor((now - start) / (1000 * 60));
+        const d = Math.floor(totalMinutes / 1440);
+        const h = Math.floor((totalMinutes % 1440) / 60);
+        const m = totalMinutes % 60;
+        const dayWord  = d >= 3 && d <= 10 ? 'أيام' : 'يوم';
+        const hourWord = h >= 3 && h <= 10 ? 'ساعات' : 'ساعة';
+        let daysLabel = '';
+        if (d > 0) daysLabel += d + ' ' + dayWord + ' ';
+        if (h > 0) daysLabel += h + ' ' + hourWord;
+        if (daysLabel === '') daysLabel = '0 ساعة';
+
         document.getElementById('actualDailyRate').innerText = actualDailyRate.toFixed(2) + " GB";
-        document.getElementById('daysPassed').innerText      = daysPassed.toFixed(1);
+        document.getElementById('daysPassed').innerText      = daysLabel.trim();
         document.getElementById('safeRate').innerText        = safeRate.toFixed(2) + " GB";
 
         const resultEl = document.getElementById('consResult');
