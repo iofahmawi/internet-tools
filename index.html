@@ -519,7 +519,7 @@
             direction: ltr;
             display: block;
         }
-        #daysPassed { direction: rtl; font-size: 0.93rem; }
+        #daysPassed { direction: rtl; font-size: 1rem; }
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
@@ -992,13 +992,14 @@
         const m = totalMinutes % 60;
         const dayWord  = d >= 3 && d <= 10 ? 'أيام' : 'يوم';
         const hourWord = h >= 3 && h <= 10 ? 'ساعات' : 'ساعة';
+        const s = 'font-size:0.93rem';
         let daysLabel = '';
-        if (d > 0) daysLabel += d + ' ' + dayWord + ' ';
-        if (h > 0) daysLabel += h + ' ' + hourWord;
-        if (daysLabel === '') daysLabel = '0 ساعة';
+        if (d > 0) daysLabel += d + ' <span style="'+s+'">' + dayWord + '</span> ';
+        if (h > 0) daysLabel += h + ' <span style="'+s+'">' + hourWord + '</span>';
+        if (daysLabel === '') daysLabel = '0 <span style="'+s+'">ساعة</span>';
 
         document.getElementById('actualDailyRate').innerText = actualDailyRate.toFixed(2) + " GB";
-        document.getElementById('daysPassed').innerText      = daysLabel.trim();
+        document.getElementById('daysPassed').innerHTML     = daysLabel.trim();
         document.getElementById('safeRate').innerText        = safeRate.toFixed(2) + " GB";
 
         const resultEl = document.getElementById('consResult');
