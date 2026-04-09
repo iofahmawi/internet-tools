@@ -532,6 +532,30 @@
         @media (display-mode: standalone) {
             .page { padding-top: 0.7cm; }
         }
+
+        /* ========== CONS ERROR ========== */
+        .cons-error {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            margin-top: 14px;
+            padding: 10px 16px;
+            background: #eef2ff;
+            border-radius: 50px;
+            animation: fadeSlideIn 0.2s ease;
+        }
+        .cons-error.show { display: flex; }
+        .cons-error svg { color: var(--accent-color); flex-shrink: 0; }
+        .cons-error-text {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--accent-color);
+        }
+        @keyframes fadeSlideIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
@@ -780,6 +804,15 @@
         </div>
 
         <button class="cons-btn" onclick="calculateConsumption()">احسب المعدل</button>
+
+        <div class="cons-error" id="consError">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <span class="cons-error-text" id="consErrorText"></span>
+        </div>
     </div>
 
     <div class="cons-result" id="consResult">
@@ -908,6 +941,16 @@
         });
     });
 
+    function showConsError(msg) {
+        const el = document.getElementById('consError');
+        document.getElementById('consErrorText').textContent = msg;
+        el.classList.add('show');
+        el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    function hideConsError() {
+        document.getElementById('consError').classList.remove('show');
+    }
+
     function calculateConsumption() {
         const capInput      = document.getElementById('capacity').value;
         const remInput      = document.getElementById('remaining').value;
@@ -916,7 +959,7 @@
         const endDateVal    = document.getElementById('endDate').value;
 
         if (!capInput || isNaN(parseFloat(remInput)) || !startDateVal || !startTimeVal || !endDateVal) {
-            alert("يرجى ملء كافة الخانات"); return;
+            showConsError("يرجى ملء كافة الخانات"); return;
         }
 
         localStorage.setItem('cons_capacity',  capInput);
@@ -929,8 +972,10 @@
         const end   = new Date(`${endDateVal}T23:59:59`);
         const now   = new Date();
 
-        if (now < start) { alert("تاريخ البداية يجب أن يكون في الماضي"); return; }
-        if (end <= now)  { alert("تاريخ الانتهاء يجب أن يكون في المستقبل"); return; }
+        if (now < start) { showConsError("تاريخ البداية يجب أن يكون في الماضي"); return; }
+        if (end <= now)  { showConsError("تاريخ الانتهاء يجب أن يكون في المستقبل"); return; }
+
+        hideConsError();
 
         const cap       = parseFloat(capInput);
         const rem       = parseFloat(remInput);
