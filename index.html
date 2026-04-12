@@ -12,7 +12,7 @@
     <link rel="apple-touch-icon" href="icon-1440.png">
     <title>أدوات الإنترنت</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
     <style>
         :root {
             --primary-gradient: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
@@ -419,9 +419,9 @@
 
         .cons-input {
             width: 100%;
-            height: 48px;
-            min-height: 48px;
-            max-height: 48px;
+            height: 40px;
+            min-height: 42px;
+            max-height: 42px;
             border: 1.5px solid var(--border-color);
             border-radius: 10px;
             font-size: 1rem;
@@ -434,7 +434,7 @@
             font-family: 'Tajawal', sans-serif;
             color: var(--text-main);
             font-weight: 500;
-            padding: 8px 10px 0 10px;
+            padding: 7px 10px 0 10px;
             line-height: normal;
             transition: border-color 0.2s;
             box-sizing: border-box;
@@ -446,8 +446,6 @@
             border-color: var(--accent-color);
             box-shadow: 0 0 0 3px rgba(79,70,229,0.1);
         }
-
-        .cons-full { grid-column: 1 / -1; }
 
         .cons-btn {
             display: block;
@@ -535,8 +533,12 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* flatpickr overrides */
-        .flatpickr-calendar { font-family: 'Tajawal', sans-serif !important; }
+        .cons-full { grid-column: 1 / -1; }
+
+        /* native date/time inputs */
+        input[type="date"], input[type="time"] {
+            color-scheme: light;
+        }
 
         @media (display-mode: standalone) {
             .page { padding-top: 0.7cm; }
@@ -1000,13 +1002,13 @@
             <div class="cons-group">
                 <label class="cons-label">تاريخ البداية</label>
                 <div class="cons-input-wrap">
-                    <input class="cons-input" type="text" id="startDate" readonly>
+                    <input class="cons-input" type="date" id="startDate">
                 </div>
             </div>
             <div class="cons-group">
                 <label class="cons-label">وقت البداية</label>
                 <div class="cons-input-wrap">
-                    <input class="cons-input" type="text" id="startTime" readonly>
+                    <input class="cons-input" type="time" id="startTime">
                 </div>
             </div>
         </div>
@@ -1015,13 +1017,13 @@
             <div class="cons-group">
                 <label class="cons-label">تاريخ انتهاء الاشتراك</label>
                 <div class="cons-input-wrap">
-                    <input class="cons-input" type="text" id="endDate" readonly>
+                    <input class="cons-input" type="date" id="endDate">
                 </div>
             </div>
             <div class="cons-group">
                 <label class="cons-label">وقت الانتهاء</label>
                 <div class="cons-input-wrap">
-                    <input class="cons-input" type="text" id="endTime" readonly>
+                    <input class="cons-input" type="time" id="endTime">
                 </div>
             </div>
         </div>
@@ -1057,7 +1059,7 @@
 
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
 <script>
     // ========== EXPORT / IMPORT ==========
     function exportData() {
@@ -1103,13 +1105,7 @@
                 const fields = ['capacity','remaining','startDate','startTime','endDate','endTime'];
                 fields.forEach(id => {
                     const val = localStorage.getItem('cons_' + id);
-                    if (val) {
-                        document.getElementById(id).value = val;
-                        if (id === 'startDate') datePicker.setDate(val);
-                        if (id === 'endDate')   endDatePicker.setDate(val);
-                        if (id === 'startTime') timePicker.setDate(val);
-                        if (id === 'endTime')   endTimePicker.setDate(val);
-                    }
+                    if (val) document.getElementById(id).value = val;
                 });
                 closeSidebar();
                 showToast('✓ تم استيراد البيانات');
@@ -1239,24 +1235,11 @@
         setTimeout(() => { resBox.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
     }
 
-    // ========== CONSUMPTION CALCULATOR ==========
-    const dateConfig = { dateFormat: "Y-m-d" };
-    const datePicker    = flatpickr("#startDate", dateConfig);
-    const endDatePicker = flatpickr("#endDate", dateConfig);
-    const timePicker    = flatpickr("#startTime", { enableTime: true, noCalendar: true, dateFormat: "H:i", time_24hr: true });
-    const endTimePicker = flatpickr("#endTime",   { enableTime: true, noCalendar: true, dateFormat: "H:i", time_24hr: true });
-
+    // ========== LOAD FROM LOCALSTORAGE ==========
     window.addEventListener('load', function() {
-        const fields = ['capacity', 'remaining', 'startDate', 'startTime', 'endDate', 'endTime'];
-        fields.forEach(id => {
+        ['capacity','remaining','startDate','startTime','endDate','endTime'].forEach(id => {
             const val = localStorage.getItem('cons_' + id);
-            if (val) {
-                document.getElementById(id).value = val;
-                if (id === 'startDate') datePicker.setDate(val);
-                if (id === 'endDate')   endDatePicker.setDate(val);
-                if (id === 'startTime') timePicker.setDate(val);
-                if (id === 'endTime')   endTimePicker.setDate(val);
-            }
+            if (val) document.getElementById(id).value = val;
         });
     });
 
