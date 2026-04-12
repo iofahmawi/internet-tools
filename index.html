@@ -533,6 +533,155 @@
             .page { padding-top: 0.7cm; }
         }
 
+        /* ========== CONFIRM MODAL ========== */
+        .confirm-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.35);
+            z-index: 300;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+        }
+        .confirm-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        .confirm-sheet {
+            background: white;
+            width: 100%;
+            max-width: 320px;
+            border-radius: 24px;
+            padding: 28px 24px 24px;
+            transform: scale(0.92);
+            transition: transform 0.2s cubic-bezier(0.4,0,0.2,1);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+        }
+        .confirm-overlay.active .confirm-sheet {
+            transform: scale(1);
+        }
+        .confirm-icon {
+            width: 52px;
+            height: 52px;
+            background: #fff0f0;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+        }
+        .confirm-title {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: #111827;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+        .confirm-subtitle {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            text-align: center;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+        .confirm-btns {
+            display: flex;
+            flex-direction: row-reverse;
+            gap: 10px;
+        }
+        .confirm-btn-danger {
+            flex: 1;
+            padding: 13px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .confirm-btn-danger:active { opacity: 0.85; }
+        .confirm-btn-cancel {
+            flex: 1;
+            padding: 13px;
+            background: #f1f5f9;
+            color: var(--text-main);
+            border: none;
+            border-radius: 14px;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .confirm-btn-cancel:active { background: #e2e8f0; }
+
+        /* ========== SIDEBAR FOOTER ========== */
+        .sidebar-footer {
+            padding: 10px 10px 24px;
+            border-top: 1px solid #f1f5f9;
+        }
+        .sidebar-action-btn {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 11px 14px;
+            border-radius: 12px;
+            cursor: pointer;
+            width: 100%;
+            background: transparent;
+            border: none;
+            text-align: right;
+            font-family: 'Tajawal', sans-serif;
+            margin-bottom: 2px;
+            transition: background 0.2s;
+        }
+        .sidebar-action-btn:active { background: #f1f5f9; }
+        .sidebar-action-btn .sab-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: #f1f5f9;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .sidebar-action-btn .sab-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        /* ========== TOAST ========== */
+        .toast {
+            position: fixed;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%) translateY(16px);
+            background: #1e293b;
+            color: white;
+            padding: 11px 24px 9px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            font-family: 'Tajawal', sans-serif;
+            opacity: 0;
+            transition: opacity 0.25s, transform 0.25s;
+            z-index: 999;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
         /* ========== CONS ERROR ========== */
         .cons-error {
             display: none;
@@ -606,8 +755,67 @@
                 <span class="nav-item-subtitle">السرعة المناسبة لاشتراكك</span>
             </div>
         </button>
+
+        <div class="nav-divider"></div>
+
+        <button class="sidebar-action-btn" onclick="document.getElementById('importFileInput').click()">
+            <div class="sab-icon">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="17 8 12 3 7 8"/>
+                    <line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+            </div>
+            <span class="sab-title">استيراد البيانات</span>
+        </button>
+
+        <button class="sidebar-action-btn" onclick="exportData()">
+            <div class="sab-icon">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+            </div>
+            <span class="sab-title">تصدير البيانات</span>
+        </button>
+
+        <button class="sidebar-action-btn" onclick="clearData()">
+            <div class="sab-icon" style="background:#fff0f0;">
+                <svg width="20" height="20" fill="none" stroke="#ef4444" stroke-width="2" viewBox="0 0 24 24">
+                    <polyline points="3 6 5 6 21 6"/>
+                    <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                    <path d="M10 11v6m4-6v6"/>
+                    <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                </svg>
+            </div>
+            <span class="sab-title" style="color:#ef4444;">مسح البيانات</span>
+        </button>
     </div>
 </nav>
+
+<input type="file" id="importFileInput" accept=".json" style="display:none" onchange="handleImport(event)">
+<div class="toast" id="appToast"></div>
+
+<!-- Confirm Modal -->
+<div class="confirm-overlay" id="confirmOverlay" onclick="closeConfirm()">
+    <div class="confirm-sheet" onclick="event.stopPropagation()">
+        <div class="confirm-icon">
+            <svg width="26" height="26" fill="none" stroke="#ef4444" stroke-width="2" viewBox="0 0 24 24">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                <path d="M10 11v6m4-6v6"/>
+                <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+            </svg>
+        </div>
+        <div class="confirm-title">مسح البيانات</div>
+        <div class="confirm-subtitle">سيتم حذف جميع بيانات حاسبة الاستهلاك<br>ولا يمكن التراجع عن هذا الإجراء.</div>
+        <div class="confirm-btns">
+            <button class="confirm-btn-danger" onclick="confirmClear()">مسح</button>
+            <button class="confirm-btn-cancel" onclick="closeConfirm()">إلغاء</button>
+        </div>
+    </div>
+</div>
 
 <!-- ===================== PAGE: SPEED CALCULATOR ===================== -->
 <div id="page-speed" class="page">
@@ -836,6 +1044,98 @@
 
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
+    // ========== EXPORT / IMPORT ==========
+    function exportData() {
+        const keys = ['cons_capacity','cons_remaining','cons_startDate','cons_startTime','cons_endDate'];
+        const data = {};
+        keys.forEach(k => {
+            const v = localStorage.getItem(k);
+            if (v !== null) data[k] = v;
+        });
+
+        const payload = {
+            app: 'أدوات الإنترنت',
+            version: 1,
+            exportDate: new Date().toISOString(),
+            data
+        };
+
+        const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+        const url  = URL.createObjectURL(blob);
+        const a    = document.createElement('a');
+        a.href     = url;
+        const d    = new Date();
+        const dd   = String(d.getDate()).padStart(2,'0');
+        const mm   = String(d.getMonth()+1).padStart(2,'0');
+        const yy   = d.getFullYear();
+        a.download = `internet tools ${d.getDate()}-${d.getMonth()+1}-${d.getFullYear()}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        closeSidebar();
+        showToast('✓ تم تصدير البيانات');
+    }
+
+    function handleImport(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const payload = JSON.parse(e.target.result);
+                if (!payload.data || typeof payload.data !== 'object') throw new Error('invalid');
+                Object.entries(payload.data).forEach(([k, v]) => localStorage.setItem(k, v));
+                // إعادة تحميل الحقول
+                const fields = ['capacity','remaining','startDate','startTime','endDate'];
+                fields.forEach(id => {
+                    const val = localStorage.getItem('cons_' + id);
+                    if (val) {
+                        document.getElementById(id).value = val;
+                        if (id === 'startDate') datePicker.setDate(val);
+                        if (id === 'endDate')   endDatePicker.setDate(val);
+                        if (id === 'startTime') timePicker.setDate(val);
+                    }
+                });
+                closeSidebar();
+                showToast('✓ تم استيراد البيانات');
+            } catch(err) {
+                showToast('✗ الملف غير صالح');
+            }
+        };
+        reader.readAsText(file);
+        event.target.value = '';
+    }
+
+    function showToast(msg) {
+        const t = document.getElementById('appToast');
+        t.textContent = msg;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 2500);
+    }
+
+    function clearData() {
+        closeSidebar();
+        setTimeout(() => {
+            document.getElementById('confirmOverlay').classList.add('active');
+        }, 300);
+    }
+
+    function closeConfirm() {
+        document.getElementById('confirmOverlay').classList.remove('active');
+    }
+
+    function confirmClear() {
+        ['cons_capacity','cons_remaining','cons_startDate','cons_startTime','cons_endDate'].forEach(k => localStorage.removeItem(k));
+        document.getElementById('capacity').value  = '';
+        document.getElementById('remaining').value = '';
+        datePicker.clear();
+        endDatePicker.clear();
+        timePicker.clear();
+        document.getElementById('consResult').style.display = 'none';
+        hideConsError();
+        closeConfirm();
+        showToast('✓ تم مسح البيانات');
+    }
+
     // ========== SIDEBAR ==========
     function openSidebar() {
         document.getElementById('sidebar').classList.add('open');
