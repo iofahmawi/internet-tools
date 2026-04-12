@@ -254,17 +254,22 @@
             border: 1px solid var(--border-color);
             border-radius: 50px;
             display: flex;
-            align-items: flex-start;
+            align-items: center;
             justify-content: space-between;
             width: 100px;
+            min-width: 100px;
+            max-width: 100px;
             height: 32px;
+            min-height: 32px;
+            max-height: 32px;
             padding: 0;
             overflow: hidden;
+            box-sizing: border-box;
         }
 
         .stepper-btn {
             width: 32px;
-            height: 100%;
+            height: 32px;
             background: transparent;
             border: none;
             box-shadow: none;
@@ -278,14 +283,13 @@
             flex-shrink: 0;
             line-height: 1;
             padding: 0;
-            padding-top: 2px;
         }
         .stepper-btn:active { background-color: #f1f5f9; }
 
         .stepper-value {
             flex: 1;
-            width: 100%;
-            height: 100%;
+            width: 36px;
+            height: 32px;
             background: transparent;
             border: none;
             text-align: center;
@@ -296,8 +300,7 @@
             outline: none;
             font-family: 'Tajawal', sans-serif;
             padding: 0;
-            padding-top: 6px;
-            line-height: normal;
+            line-height: 32px;
         }
 
         .action-btn {
@@ -410,12 +413,15 @@
             height: 0;
             border-left: 4px solid transparent;
             border-right: 4px solid transparent;
-            border-top: 5px solid #999;
+            border-top: 5px solid white;
             pointer-events: none;
         }
 
         .cons-input {
             width: 100%;
+            height: 48px;
+            min-height: 48px;
+            max-height: 48px;
             border: 1.5px solid var(--border-color);
             border-radius: 10px;
             font-size: 1rem;
@@ -428,11 +434,14 @@
             font-family: 'Tajawal', sans-serif;
             color: var(--text-main);
             font-weight: 500;
-            padding: 14px 10px 8px 35px;
+            padding: 8px 10px 0 10px;
             line-height: normal;
             transition: border-color 0.2s;
+            box-sizing: border-box;
         }
-        .cons-input[type="number"] { padding: 14px 10px 8px; }
+        .cons-input-wrap .cons-input {
+            padding-left: 30px;
+        }
         .cons-input:focus {
             border-color: var(--accent-color);
             box-shadow: 0 0 0 3px rgba(79,70,229,0.1);
@@ -1003,10 +1012,16 @@
         </div>
 
         <div class="cons-row" style="margin-bottom: 0;">
-            <div class="cons-group cons-full">
+            <div class="cons-group">
                 <label class="cons-label">تاريخ انتهاء الاشتراك</label>
                 <div class="cons-input-wrap">
                     <input class="cons-input" type="text" id="endDate" readonly>
+                </div>
+            </div>
+            <div class="cons-group">
+                <label class="cons-label">وقت الانتهاء</label>
+                <div class="cons-input-wrap">
+                    <input class="cons-input" type="text" id="endTime" readonly>
                 </div>
             </div>
         </div>
@@ -1046,7 +1061,7 @@
 <script>
     // ========== EXPORT / IMPORT ==========
     function exportData() {
-        const keys = ['cons_capacity','cons_remaining','cons_startDate','cons_startTime','cons_endDate'];
+        const keys = ['cons_capacity','cons_remaining','cons_startDate','cons_startTime','cons_endDate','cons_endTime'];
         const data = {};
         keys.forEach(k => {
             const v = localStorage.getItem(k);
@@ -1085,7 +1100,7 @@
                 if (!payload.data || typeof payload.data !== 'object') throw new Error('invalid');
                 Object.entries(payload.data).forEach(([k, v]) => localStorage.setItem(k, v));
                 // إعادة تحميل الحقول
-                const fields = ['capacity','remaining','startDate','startTime','endDate'];
+                const fields = ['capacity','remaining','startDate','startTime','endDate','endTime'];
                 fields.forEach(id => {
                     const val = localStorage.getItem('cons_' + id);
                     if (val) {
@@ -1093,6 +1108,7 @@
                         if (id === 'startDate') datePicker.setDate(val);
                         if (id === 'endDate')   endDatePicker.setDate(val);
                         if (id === 'startTime') timePicker.setDate(val);
+                        if (id === 'endTime')   endTimePicker.setDate(val);
                     }
                 });
                 closeSidebar();
@@ -1124,12 +1140,13 @@
     }
 
     function confirmClear() {
-        ['cons_capacity','cons_remaining','cons_startDate','cons_startTime','cons_endDate'].forEach(k => localStorage.removeItem(k));
+        ['cons_capacity','cons_remaining','cons_startDate','cons_startTime','cons_endDate','cons_endTime'].forEach(k => localStorage.removeItem(k));
         document.getElementById('capacity').value  = '';
         document.getElementById('remaining').value = '';
         datePicker.clear();
         endDatePicker.clear();
         timePicker.clear();
+        endTimePicker.clear();
         document.getElementById('consResult').style.display = 'none';
         hideConsError();
         closeConfirm();
@@ -1227,9 +1244,10 @@
     const datePicker    = flatpickr("#startDate", dateConfig);
     const endDatePicker = flatpickr("#endDate", dateConfig);
     const timePicker    = flatpickr("#startTime", { enableTime: true, noCalendar: true, dateFormat: "H:i", time_24hr: true });
+    const endTimePicker = flatpickr("#endTime",   { enableTime: true, noCalendar: true, dateFormat: "H:i", time_24hr: true });
 
     window.addEventListener('load', function() {
-        const fields = ['capacity', 'remaining', 'startDate', 'startTime', 'endDate'];
+        const fields = ['capacity', 'remaining', 'startDate', 'startTime', 'endDate', 'endTime'];
         fields.forEach(id => {
             const val = localStorage.getItem('cons_' + id);
             if (val) {
@@ -1237,6 +1255,7 @@
                 if (id === 'startDate') datePicker.setDate(val);
                 if (id === 'endDate')   endDatePicker.setDate(val);
                 if (id === 'startTime') timePicker.setDate(val);
+                if (id === 'endTime')   endTimePicker.setDate(val);
             }
         });
     });
@@ -1257,8 +1276,9 @@
         const startDateVal  = document.getElementById('startDate').value;
         const startTimeVal  = document.getElementById('startTime').value;
         const endDateVal    = document.getElementById('endDate').value;
+        const endTimeVal    = document.getElementById('endTime').value;
 
-        if (!capInput || isNaN(parseFloat(remInput)) || !startDateVal || !startTimeVal || !endDateVal) {
+        if (!capInput || isNaN(parseFloat(remInput)) || !startDateVal || !startTimeVal || !endDateVal || !endTimeVal) {
             showConsError("يرجى ملء كافة الخانات"); return;
         }
 
@@ -1267,9 +1287,10 @@
         localStorage.setItem('cons_startDate', startDateVal);
         localStorage.setItem('cons_startTime', startTimeVal);
         localStorage.setItem('cons_endDate',   endDateVal);
+        localStorage.setItem('cons_endTime',   endTimeVal);
 
         const start = new Date(`${startDateVal}T${startTimeVal}`);
-        const end   = new Date(`${endDateVal}T23:59:59`);
+        const end   = new Date(`${endDateVal}T${endTimeVal}`);
         const now   = new Date();
 
         if (now < start) { showConsError("تاريخ البداية يجب أن يكون في الماضي"); return; }
