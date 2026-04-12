@@ -716,6 +716,141 @@
             from { opacity: 0; transform: translateY(-4px); }
             to   { opacity: 1; transform: translateY(0); }
         }
+        /* ========== STREAMING CALCULATOR ========== */
+        .stream-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 4px;
+        }
+        .stream-field {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .stream-label {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #374151;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .stream-label-badge {
+            display: inline-block;
+            background: #eef2ff;
+            color: var(--accent-color);
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 4px 8px 0px;
+            border-radius: 20px;
+            vertical-align: middle;
+            position: relative;
+            top: -3px;
+        }
+        .stream-input {
+            width: 100%;
+            height: 42px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 1.15rem;
+            font-weight: 700;
+            text-align: center;
+            outline: none;
+            background: #fff;
+            font-family: 'Tajawal', sans-serif;
+            color: var(--text-main);
+            transition: border-color 0.2s;
+            direction: ltr;
+            padding: 8px 0 0 0;
+            line-height: normal;
+            display: block;
+        }
+        .stream-input:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(79,70,229,0.1);
+        }
+        .stream-duration-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+        .stream-result {
+            display: none;
+            margin-top: 22px;
+            background: linear-gradient(135deg, #eef2ff 0%, #f5f3ff 100%);
+            border-radius: 20px;
+            padding: 22px 18px 18px;
+            text-align: center;
+            animation: fadeIn 0.3s ease;
+            border: 1.5px solid #e0e7ff;
+        }
+        .stream-result-label {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            display: block;
+        }
+        .stream-result-value {
+            font-size: 3rem;
+            font-weight: 800;
+            direction: ltr;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.1;
+            display: inline;
+        }
+        .stream-result-unit {
+            font-size: 1.4rem;
+            font-weight: 800;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline;
+            margin-right: 6px;
+        }
+        .stream-result-number-line {
+            display: block;
+            direction: ltr;
+        }
+        .stream-result-sub {
+            margin-top: 14px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        .stream-sub-pill {
+            background: white;
+            border: 1px solid #e0e7ff;
+            border-radius: 50px;
+            padding: 6px 14px 4px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+        .stream-sub-pill b { color: var(--accent-color); }
+        .stream-error {
+            display: none;
+            align-items: center;
+            gap: 7px;
+            margin-top: 14px;
+            padding: 10px 16px;
+            background: #eef2ff;
+            border-radius: 50px;
+            animation: fadeSlideIn 0.2s ease;
+        }
+        .stream-error.show { display: flex; }
+        .stream-error-text {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--accent-color);
+        }
+
     </style>
 </head>
 <body>
@@ -764,6 +899,24 @@
             <div class="nav-item-text">
                 <span class="nav-item-title">حاسبة السرعة</span>
                 <span class="nav-item-subtitle">السرعة المناسبة لاشتراكك</span>
+            </div>
+        </button>
+
+        <div class="nav-divider"></div>
+
+        <button class="nav-item" id="nav-streaming" onclick="navigateTo('streaming')">
+            <div class="nav-item-icon">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="2.5" fill="currentColor" stroke="none"></circle>
+                    <path d="M12 7A5 5 0 0 0 12 17"></path>
+                    <path d="M12 7A5 5 0 0 1 12 17"></path>
+                    <path d="M12 3.5A8.5 8.5 0 0 0 12 20.5"></path>
+                    <path d="M12 3.5A8.5 8.5 0 0 1 12 20.5"></path>
+                </svg>
+            </div>
+            <div class="nav-item-text">
+                <span class="nav-item-title">حاسبة البث المباشر</span>
+                <span class="nav-item-subtitle">استهلاك البث حسب المدة</span>
             </div>
         </button>
 
@@ -1309,7 +1462,131 @@
         const resultEl = document.getElementById('consResult');
         resultEl.style.display = 'block';
     }
+
+    // ========== STREAMING CALCULATOR ==========
+    function calculateStreaming() {
+        const speedMbps = parseFloat(document.getElementById('streamSpeed').value);
+        const speedKbps = parseFloat(document.getElementById('streamSpeedKbps').value);
+        const hours     = parseInt(document.getElementById('streamHours').value)   || 0;
+        const minutes   = parseInt(document.getElementById('streamMinutes').value) || 0;
+
+        const errEl   = document.getElementById('streamError');
+        const errText = document.getElementById('streamErrorText');
+
+        const hasMbps = !isNaN(speedMbps) && speedMbps > 0;
+        const hasKbps = !isNaN(speedKbps) && speedKbps > 0;
+
+        if (!hasMbps && !hasKbps) {
+            errText.textContent = 'يرجى إدخال سرعة الإنترنت';
+            errEl.classList.add('show');
+            return;
+        }
+        if (hours === 0 && minutes === 0) {
+            errText.textContent = 'يرجى إدخال مدة البث';
+            errEl.classList.add('show');
+            return;
+        }
+        errEl.classList.remove('show');
+
+        // Convert to Mbps for calculation
+        const speed = hasMbps ? speedMbps : speedKbps / 1000;
+        const speedLabel = hasMbps ? speedMbps + ' Mbps' : speedKbps + ' kbps';
+
+        // speed(Mbps) × totalSeconds ÷ 8 ÷ 1000 = GB
+        const totalMinutes = hours * 60 + minutes;
+        const totalSeconds = totalMinutes * 60;
+        const gbRaw = speed * totalSeconds / 8 / 1000;
+
+        let displayValue, displayUnit;
+        if (gbRaw < 1) {
+            displayValue = (gbRaw * 1000).toFixed(0);
+            displayUnit  = 'MB';
+        } else {
+            displayValue = gbRaw.toFixed(2);
+            displayUnit  = 'GB';
+        }
+
+        let durationLabel = '';
+        if (hours > 0)   durationLabel += hours + ' س';
+        if (minutes > 0) durationLabel += (hours > 0 ? ' ' : '') + minutes + ' د';
+
+        document.getElementById('streamResultValue').textContent    = displayValue;
+        document.getElementById('streamResultUnit').textContent     = displayUnit;
+        document.getElementById('streamResultDuration').textContent = durationLabel;
+        document.getElementById('streamResultSpeed').textContent    = speedLabel;
+
+        const resultEl = document.getElementById('streamResult');
+        resultEl.style.display = 'block';
+    }
 </script>
+
+<!-- ===================== PAGE: STREAMING CALCULATOR ===================== -->
+<div id="page-streaming" class="page">
+    <div class="cons-card">
+        <div class="card-header">
+            <div class="header-spacer"></div>
+            <h1>حاسبة البث المباشر</h1>
+            <button class="menu-btn" onclick="openSidebar()"><span></span><span></span><span></span></button>
+        </div>
+
+        <div class="stream-input-group">
+            <div class="stream-field">
+                <label class="stream-label">
+                    سرعة الإنترنت
+                    <span class="stream-label-badge">Mbps</span>
+                </label>
+                <input class="stream-input" type="number" id="streamSpeed" inputmode="decimal" step="0.1" min="0" oninput="if(this.value)document.getElementById('streamSpeedKbps').value=''">
+            </div>
+
+            <div class="stream-field">
+                <label class="stream-label">
+                    سرعة الإنترنت
+                    <span class="stream-label-badge" style="background:#fef3c7;color:#92400e;">kbps</span>
+                </label>
+                <input class="stream-input" type="number" id="streamSpeedKbps" inputmode="decimal" step="1" min="0" oninput="if(this.value)document.getElementById('streamSpeed').value=''">
+            </div>
+
+            <div>
+                <label class="stream-label" style="margin-bottom:10px;">مدة البث</label>
+                <div class="stream-duration-row">
+                    <div class="stream-field">
+                        <label class="stream-label" style="font-weight:500; color:var(--text-secondary);">
+                            <span class="stream-label-badge">ساعات</span>
+                        </label>
+                        <input class="stream-input" type="number" id="streamHours" inputmode="numeric" min="0">
+                    </div>
+                    <div class="stream-field">
+                        <label class="stream-label" style="font-weight:500; color:var(--text-secondary);">
+                            <span class="stream-label-badge">دقائق</span>
+                        </label>
+                        <input class="stream-input" type="number" id="streamMinutes" inputmode="numeric" min="0" max="59">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stream-error" id="streamError">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            <span class="stream-error-text" id="streamErrorText"></span>
+        </div>
+
+        <button class="cons-btn" onclick="calculateStreaming()">احسب الاستهلاك</button>
+
+        <div class="stream-result" id="streamResult">
+            <span class="stream-result-label">إجمالي الاستهلاك المتوقع</span>
+            <span class="stream-result-number-line">
+                <span class="stream-result-value" id="streamResultValue">0</span>
+                <span class="stream-result-unit" id="streamResultUnit">GB</span>
+            </span>
+            <div class="stream-result-sub">
+                <div class="stream-sub-pill">المدة: <b id="streamResultDuration">—</b></div>
+                <div class="stream-sub-pill">السرعة: <b id="streamResultSpeed" style="direction:ltr;display:inline-block;">—</b></div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
   if ('serviceWorker' in navigator) {
