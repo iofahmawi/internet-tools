@@ -340,7 +340,9 @@
         .speed-display {
             font-size: 3.2rem;
             font-weight: 800;
-            line-height: 1;
+            line-height: 1.3;
+            padding-top: 4px;
+            display: inline-block;
             margin: 0;
             margin-bottom: 6px;
             background: var(--primary-gradient);
@@ -371,6 +373,7 @@
             margin: 0;
             margin-top: 11px;
             line-height: 1.5;
+            white-space: nowrap;
         }
 
         /* ========== CONSUMPTION CALCULATOR ========== */
@@ -795,15 +798,18 @@
         .stream-result-value {
             font-size: 3rem;
             font-weight: 800;
+            font-family: 'Tajawal', sans-serif;
             direction: ltr;
             background: var(--primary-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            line-height: 1.1;
-            display: inline;
+            line-height: 1.3;
+            display: inline-block;
+            padding-top: 4px;
         }
         .stream-result-unit {
-            font-size: 1.4rem;
+            font-size: 1.8rem;
+            font-family: 'Tajawal', sans-serif;
             font-weight: 800;
             background: var(--primary-gradient);
             -webkit-background-clip: text;
@@ -1507,14 +1513,9 @@
             displayUnit  = 'GB';
         }
 
-        let durationLabel = '';
-        if (hours > 0)   durationLabel += hours + ' س';
-        if (minutes > 0) durationLabel += (hours > 0 ? ' ' : '') + minutes + ' د';
-
-        document.getElementById('streamResultValue').textContent    = displayValue;
-        document.getElementById('streamResultUnit').textContent     = displayUnit;
-        document.getElementById('streamResultDuration').textContent = durationLabel;
-        document.getElementById('streamResultSpeed').textContent    = speedLabel;
+        document.getElementById('streamResultValue').textContent = displayValue;
+        document.getElementById('streamResultUnit').textContent  = displayUnit;
+        document.getElementById('streamResultSpeed').textContent = speedLabel;
 
         const resultEl = document.getElementById('streamResult');
         resultEl.style.display = 'block';
@@ -1582,7 +1583,6 @@
                 <span class="stream-result-unit" id="streamResultUnit">GB</span>
             </span>
             <div class="stream-result-sub">
-                <div class="stream-sub-pill">المدة: <b id="streamResultDuration">—</b></div>
                 <div class="stream-sub-pill">السرعة: <b id="streamResultSpeed" style="direction:ltr;display:inline-block;">—</b></div>
             </div>
         </div>
