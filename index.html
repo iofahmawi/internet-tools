@@ -1490,7 +1490,7 @@
 
         // Convert to Mbps for calculation
         const speed = hasMbps ? speedMbps : speedKbps / 1000;
-        const speedLabel = hasMbps ? speedMbps + ' Mbps' : speedKbps + ' kbps';
+        const speedLabel = hasMbps ? speedMbps + ' Mbps' : speedKbps + ' Kbps';
 
         // speed(Mbps) × totalSeconds ÷ 8 ÷ 1000 = GB
         const totalMinutes = hours * 60 + minutes;
@@ -1541,7 +1541,7 @@
             <div class="stream-field">
                 <label class="stream-label">
                     سرعة الإنترنت
-                    <span class="stream-label-badge" style="background:#fef3c7;color:#92400e;">kbps</span>
+                    <span class="stream-label-badge" style="background:#fef3c7;color:#92400e;">Kbps</span>
                 </label>
                 <input class="stream-input" type="number" id="streamSpeedKbps" inputmode="decimal" step="1" min="0" oninput="if(this.value)document.getElementById('streamSpeed').value=''">
             </div>
