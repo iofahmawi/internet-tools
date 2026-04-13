@@ -299,8 +299,8 @@
             margin: 0;
             outline: none;
             font-family: 'Tajawal', sans-serif;
-            padding: 0;
-            line-height: 32px;
+            padding: 6px 0 0 0;
+            line-height: normal;
         }
 
         .action-btn {
@@ -753,16 +753,17 @@
             height: 42px;
             border: 1.5px solid var(--border-color);
             border-radius: 12px;
-            font-size: 1.15rem;
+            font-size: 1.05rem;
             font-weight: 700;
             text-align: center;
             outline: none;
             background: #fff;
-            font-family: 'Tajawal', sans-serif;
             color: var(--text-main);
             transition: border-color 0.2s;
-            direction: ltr;
-            padding: 8px 0 0 0;
+            box-sizing: border-box;
+            appearance: none;
+            -webkit-appearance: none;
+            padding: 0;
             line-height: normal;
             display: block;
         }
