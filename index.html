@@ -24,7 +24,8 @@
             --border-color: #cbd5e1;
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; scrollbar-width: none; }
+        *::-webkit-scrollbar { display: none; }
 
         body {
             font-family: 'Tajawal', sans-serif;
@@ -194,6 +195,11 @@
         /* ========== PAGES ========== */
         .page { display: none; padding: 0.6cm 13px 50px; }
         .page.active { display: block; }
+        @media (display-mode: standalone) {
+            body:has(#page-consumption.active) { overflow: hidden; }
+            body:has(#page-speed.active) { overflow: hidden; }
+            body:has(#page-speed.active #result[style*="flex"]) { overflow: auto; }
+        }
 
         /* ========== SPEED CALCULATOR ========== */
         .main-container {
@@ -484,7 +490,7 @@
 
         .cons-main-result {
             text-align: center;
-            margin-bottom: 18px;
+            margin-bottom: 12px;
             padding: 16px 15px 10px;
             background: #eef2ff;
             border-radius: 14px;
@@ -529,7 +535,8 @@
             direction: ltr;
             display: block;
         }
-        #daysPassed { direction: rtl; font-size: 1rem; }
+        #daysPassed, #subscriptionDuration { direction: rtl; font-size: 1rem; }
+        #consumed { direction: ltr; }
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
@@ -544,7 +551,7 @@
         }
 
         @media (display-mode: standalone) {
-            .page { padding-top: 0.7cm; }
+            .page { padding-top: 0.50cm; }
         }
 
         /* ========== CONFIRM MODAL ========== */
@@ -1207,8 +1214,16 @@
         </div>
         <div class="cons-stats">
             <div class="cons-stat-item">
+                <span class="cons-stat-label">مدة الاشتراك</span>
+                <span class="cons-stat-value" id="subscriptionDuration"></span>
+            </div>
+            <div class="cons-stat-item">
                 <span class="cons-stat-label">الأيام المنقضية</span>
                 <span class="cons-stat-value" id="daysPassed"></span>
+            </div>
+            <div class="cons-stat-item">
+                <span class="cons-stat-label">كمية الاستهلاك</span>
+                <span class="cons-stat-value" id="consumed"></span>
             </div>
             <div class="cons-stat-item">
                 <span class="cons-stat-label">المعدل الآمن للمتبقي</span>
@@ -1297,12 +1312,9 @@
 
     function confirmClear() {
         ['cons_capacity','cons_remaining','cons_startDate','cons_startTime','cons_endDate','cons_endTime'].forEach(k => localStorage.removeItem(k));
-        document.getElementById('capacity').value  = '';
-        document.getElementById('remaining').value = '';
-        datePicker.clear();
-        endDatePicker.clear();
-        timePicker.clear();
-        endTimePicker.clear();
+        ['capacity','remaining','startDate','startTime','endDate','endTime'].forEach(id => {
+            document.getElementById(id).value = '';
+        });
         document.getElementById('consResult').style.display = 'none';
         hideConsError();
         closeConfirm();
@@ -1346,7 +1358,7 @@
 
     function calculateSpeed() {
         const SPEED_RATES = {
-            tv4k: 40, tvFhd: 15, mobileHigh: 25,
+            tv4k: 35, tvFhd: 15, mobileHigh: 30,
             mobileNormal: 12, laptops: 10, consoles: 10, cloudGaming: 30
         };
 
@@ -1421,7 +1433,10 @@
         const endDateVal    = document.getElementById('endDate').value;
         const endTimeVal    = document.getElementById('endTime').value;
 
-        if (!capInput || isNaN(parseFloat(remInput)) || !startDateVal || !startTimeVal || !endDateVal || !endTimeVal) {
+        const startTime = startTimeVal || '00:00';
+        const endTime   = endTimeVal   || '23:59';
+
+        if (!capInput || isNaN(parseFloat(remInput)) || !startDateVal || !endDateVal) {
             showConsError("يرجى ملء كافة الخانات"); return;
         }
 
@@ -1432,8 +1447,8 @@
         localStorage.setItem('cons_endDate',   endDateVal);
         localStorage.setItem('cons_endTime',   endTimeVal);
 
-        const start = new Date(`${startDateVal}T${startTimeVal}`);
-        const end   = new Date(`${endDateVal}T${endTimeVal}`);
+        const start = new Date(`${startDateVal}T${startTime}`);
+        const end   = new Date(`${endDateVal}T${endTime}`);
         const now   = new Date();
 
         if (now < start) { showConsError("تاريخ البداية يجب أن يكون في الماضي"); return; }
@@ -1462,8 +1477,20 @@
         if (h > 0) daysLabel += h + ' <span style="'+s+'">' + hourWord + '</span>';
         if (daysLabel === '') daysLabel = '0 <span style="'+s+'">ساعة</span>';
 
+        const totalDurMinutes = Math.floor((end - start) / (1000 * 60));
+        const td = Math.floor(totalDurMinutes / 1440);
+        const th = Math.floor((totalDurMinutes % 1440) / 60);
+        const tdWord = td >= 3 && td <= 10 ? 'أيام' : 'يوم';
+        const thWord = th >= 3 && th <= 10 ? 'ساعات' : 'ساعة';
+        let durLabel = '';
+        if (td > 0) durLabel += td + ' <span style="'+s+'">' + tdWord + '</span> ';
+        if (th > 0) durLabel += th + ' <span style="'+s+'">' + thWord + '</span>';
+        if (durLabel === '') durLabel = '0 <span style="'+s+'">ساعة</span>';
+
         document.getElementById('actualDailyRate').innerText = actualDailyRate.toFixed(2) + " GB";
         document.getElementById('daysPassed').innerHTML     = daysLabel.trim();
+        document.getElementById('subscriptionDuration').innerHTML = durLabel.trim();
+        document.getElementById('consumed').innerText       = consumed.toFixed(2) + " GB";
         document.getElementById('safeRate').innerText        = safeRate.toFixed(2) + " GB";
 
         const resultEl = document.getElementById('consResult');
