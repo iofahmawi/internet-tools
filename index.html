@@ -1358,7 +1358,7 @@
 
     function calculateSpeed() {
         const SPEED_RATES = {
-            tv4k: 35, tvFhd: 15, mobileHigh: 30,
+            tv4k: 40, tvFhd: 15, mobileHigh: 25,
             mobileNormal: 12, laptops: 10, consoles: 10, cloudGaming: 30
         };
 
@@ -1472,10 +1472,7 @@
         const dayWord  = d >= 3 && d <= 10 ? 'أيام' : 'يوم';
         const hourWord = h >= 3 && h <= 10 ? 'ساعات' : 'ساعة';
         const s = 'font-size:0.93rem';
-        let daysLabel = '';
-        if (d > 0) daysLabel += d + ' <span style="'+s+'">' + dayWord + '</span> ';
-        if (h > 0) daysLabel += h + ' <span style="'+s+'">' + hourWord + '</span>';
-        if (daysLabel === '') daysLabel = '0 <span style="'+s+'">ساعة</span>';
+        const daysLabel = d + ' <span style="'+s+'">' + dayWord + '</span>';
 
         const totalDurMinutes = Math.floor((end - start) / (1000 * 60));
         const td = Math.floor(totalDurMinutes / 1440);
