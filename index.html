@@ -370,17 +370,7 @@
             gap: 5px;
             white-space: nowrap;
         }
-        .result-details b { position: relative; top: 1px; }
-
-        .rec-text {
-            font-size: 1rem;
-            color: #1e293b;
-            font-weight: 600;
-            margin: 0;
-            margin-top: 11px;
-            line-height: 1.5;
-            white-space: nowrap;
-        }
+        .result-details b { position: relative; top: 1px; color: var(--accent-color); }
 
         /* ========== CONSUMPTION CALCULATOR ========== */
         .cons-card {
@@ -1135,10 +1125,9 @@
         <button class="action-btn" onclick="calculateSpeed()">احسب احتياجي</button>
 
         <div id="result" class="result-panel">
-            <div class="result-label">الحد الأدنى للسرعة:</div>
+            <div class="result-label">السرعة المطلوبة:</div>
             <div class="speed-display" id="speedOutput">0 Mbps</div>
             <div class="result-details" id="fullSpeedText"></div>
-            <div class="rec-text" id="recommendationText"></div>
         </div>
 
         <div style="height: 1px;"></div>
@@ -1380,30 +1369,26 @@
         let capsule = document.getElementById('fullSpeedText');
 
         resBox.style.display = 'flex';
-        document.getElementById('speedOutput').innerText = rawTotal + " Mbps";
+        document.getElementById('speedOutput').innerText = peakTotal + " Mbps";
 
         if (rawTotal > 0) {
             capsule.style.display = 'inline-flex';
-            capsule.innerHTML = "ربما تحتاج في أوقات الذروة سرعة <b dir='ltr'>" + peakTotal + " Mbps</b>";
+            let rec = "";
+            if (peakTotal <= 100) {
+                rec = "ننصحك بالاشتراك في سرعة <b>100 ميجا</b>";
+            } else if (peakTotal <= 200) {
+                rec = "ننصحك بالاشتراك في سرعة <b>200 ميجا</b>";
+            } else if (peakTotal <= 300) {
+                rec = "ننصحك بالاشتراك في سرعة <b>300 ميجا</b>";
+            } else {
+                rec = "ننصحك بالاشتراك في سرعة <b>500 ميجا</b> أو أعلى";
+            }
+            capsule.innerHTML = rec;
         } else {
             capsule.style.display = 'none';
             capsule.innerHTML = "";
         }
 
-        let rec = "";
-        if (rawTotal === 0) {
-            rec = "يرجى اختيار الأجهزة أولاً.";
-        } else if (peakTotal <= 100) {
-            rec = "ننصحك بالاشتراك في سرعة <b>100 ميجا</b>.";
-        } else if (peakTotal <= 200) {
-            rec = "ننصحك بالاشتراك في سرعة <b>200 ميجا</b>.";
-        } else if (peakTotal <= 300) {
-            rec = "ننصحك بالاشتراك في سرعة <b>300 ميجا</b>.";
-        } else {
-            rec = "ننصحك بالاشتراك في سرعة <b>500 ميجا</b> أو أعلى.";
-        }
-
-        document.getElementById('recommendationText').innerHTML = rec;
         setTimeout(() => { resBox.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
     }
 
