@@ -1347,8 +1347,8 @@
 
     function calculateSpeed() {
         const SPEED_RATES = {
-            tv4k: 35, tvFhd: 15, mobileHigh: 30,
-            mobileNormal: 12, laptops: 15, consoles: 15, cloudGaming: 35
+            tv4k: 25, tvFhd: 8, mobileHigh: 15,
+            mobileNormal: 8, laptops: 15, consoles: 10, cloudGaming: 30
         };
 
         let tv4k        = parseInt(document.getElementById('tv4k').value) || 0;
@@ -1364,7 +1364,7 @@
                        (laptops * SPEED_RATES.laptops) + (consoles * SPEED_RATES.consoles) +
                        (cloudGaming * SPEED_RATES.cloudGaming);
 
-        let peakTotal = Math.ceil(rawTotal * 1.1);
+        let peakTotal = Math.ceil(rawTotal * 1.0);
         let resBox = document.getElementById('result');
         let capsule = document.getElementById('fullSpeedText');
 
