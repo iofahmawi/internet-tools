@@ -234,9 +234,7 @@
             align-items: center;
             justify-content: space-between;
             padding: 8px 0;
-            border-bottom: 1px dashed #f3f4f6;
         }
-        .device-row:last-of-type { border-bottom: none; }
 
         .device-info { display: flex; align-items: center; gap: 12px; }
 
@@ -525,7 +523,8 @@
             direction: ltr;
             display: block;
         }
-        #daysPassed, #subscriptionDuration { direction: rtl; font-size: 1rem; }
+        #daysPassed { direction: rtl; }
+        #subscriptionDuration { direction: rtl; }
         #consumed { direction: ltr; }
 
         @keyframes fadeIn {
@@ -1374,11 +1373,11 @@
         if (rawTotal > 0) {
             capsule.style.display = 'inline-flex';
             let rec = "";
-            if (peakTotal <= 100) {
+            if (peakTotal <= 75) {
                 rec = "أقرب اشتراك متوفر حالياً <b>100 ميجا</b>";
-            } else if (peakTotal <= 200) {
+            } else if (peakTotal <= 175) {
                 rec = "أقرب اشتراك متوفر حالياً <b>200 ميجا</b>";
-            } else if (peakTotal <= 300) {
+            } else if (peakTotal <= 275) {
                 rec = "أقرب اشتراك متوفر حالياً <b>300 ميجا</b>";
             } else {
                 rec = "أقرب اشتراك متوفر حالياً <b>500 ميجا</b> أو أعلى";
@@ -1456,7 +1455,7 @@
         const m = totalMinutes % 60;
         const dayWord  = d >= 3 && d <= 10 ? 'أيام' : 'يوم';
         const hourWord = h >= 3 && h <= 10 ? 'ساعات' : 'ساعة';
-        const s = 'font-size:0.93rem';
+        const s = 'font-size:0.95rem';
         const daysLabel = d + ' <span style="'+s+'">' + dayWord + '</span>';
 
         const totalDurMinutes = Math.floor((end - start) / (1000 * 60));
