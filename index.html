@@ -526,8 +526,8 @@
             display: block;
         }
         #daysPassed { direction: rtl; }
-        #subscriptionDuration { direction: rtl; }
         #consumed { direction: ltr; }
+        #luxuryStatus { direction: rtl; }
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
@@ -1204,16 +1204,16 @@
         </div>
         <div class="cons-stats">
             <div class="cons-stat-item">
-                <span class="cons-stat-label">مدة الاشتراك</span>
-                <span class="cons-stat-value" id="subscriptionDuration"></span>
-            </div>
-            <div class="cons-stat-item">
                 <span class="cons-stat-label">الأيام المنقضية</span>
                 <span class="cons-stat-value" id="daysPassed"></span>
             </div>
             <div class="cons-stat-item">
                 <span class="cons-stat-label">كمية الاستهلاك</span>
                 <span class="cons-stat-value" id="consumed"></span>
+            </div>
+            <div class="cons-stat-item" id="luxuryStatusCard">
+                <span class="cons-stat-label">حالة الرفاهية</span>
+                <span class="cons-stat-value" id="luxuryStatus"></span>
             </div>
             <div class="cons-stat-item">
                 <span class="cons-stat-label">المعدل الآمن للمتبقي</span>
@@ -1456,25 +1456,27 @@
         const h = Math.floor((totalMinutes % 1440) / 60);
         const m = totalMinutes % 60;
         const dayWord  = d >= 3 && d <= 10 ? 'أيام' : 'يوم';
-        const hourWord = h >= 3 && h <= 10 ? 'ساعات' : 'ساعة';
         const s = 'font-size:0.95rem';
         const daysLabel = d + ' <span style="'+s+'">' + dayWord + '</span>';
 
-        const totalDurMinutes = Math.floor((end - start) / (1000 * 60));
-        const td = Math.floor(totalDurMinutes / 1440);
-        const th = Math.floor((totalDurMinutes % 1440) / 60);
-        const tdWord = td >= 3 && td <= 10 ? 'أيام' : 'يوم';
-        const thWord = th >= 3 && th <= 10 ? 'ساعات' : 'ساعة';
-        let durLabel = '';
-        if (td > 0) durLabel += td + ' <span style="'+s+'">' + tdWord + '</span> ';
-        if (th > 0) durLabel += th + ' <span style="'+s+'">' + thWord + '</span>';
-        if (durLabel === '') durLabel = '0 <span style="'+s+'">ساعة</span>';
-
         document.getElementById('actualDailyRate').innerText = actualDailyRate.toFixed(2) + " GB";
         document.getElementById('daysPassed').innerHTML     = daysLabel.trim();
-        document.getElementById('subscriptionDuration').innerHTML = durLabel.trim();
         document.getElementById('consumed').innerText       = consumed.toFixed(2) + " GB";
-        document.getElementById('safeRate').innerText        = safeRate.toFixed(2) + " GB";
+        document.getElementById('safeRate').innerText       = safeRate.toFixed(2) + " GB";
+
+        // ===== حالة الرفاهية =====
+        const luxuryCard = document.getElementById('luxuryStatusCard');
+        const luxuryEl   = document.getElementById('luxuryStatus');
+
+        if (safeRate < actualDailyRate) {
+            luxuryEl.innerHTML = 'حذر';
+        } else if (safeRate < 2 * actualDailyRate) {
+            const daysToLuxury = Math.ceil(2 * daysLeft - rem / actualDailyRate);
+            const dtWord = daysToLuxury >= 3 && daysToLuxury <= 10 ? 'أيام' : 'يوم';
+            luxuryEl.innerHTML = daysToLuxury + ' <span style="font-size:0.95rem">' + dtWord + '</span>';
+        } else {
+            luxuryEl.innerHTML = 'رفاهية';
+        }
 
         const resultEl = document.getElementById('consResult');
         resultEl.style.display = 'block';
