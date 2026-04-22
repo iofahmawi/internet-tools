@@ -1469,13 +1469,13 @@
         const luxuryEl   = document.getElementById('luxuryStatus');
 
         if (safeRate < actualDailyRate) {
-            luxuryEl.innerHTML = 'حذر';
+            luxuryEl.innerHTML = '<span style="font-size:0.95rem">حذر</span>';
         } else if (safeRate < 2 * actualDailyRate) {
             const daysToLuxury = Math.ceil(2 * daysLeft - rem / actualDailyRate);
             const dtWord = daysToLuxury >= 3 && daysToLuxury <= 10 ? 'أيام' : 'يوم';
             luxuryEl.innerHTML = daysToLuxury + ' <span style="font-size:0.95rem">' + dtWord + '</span>';
         } else {
-            luxuryEl.innerHTML = 'رفاهية';
+            luxuryEl.innerHTML = '<span style="font-size:0.95rem">رفاهية</span>';
         }
 
         const resultEl = document.getElementById('consResult');
