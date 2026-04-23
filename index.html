@@ -120,7 +120,7 @@
 
         .sidebar-header {
             background: var(--primary-gradient);
-            padding: 50px 20px 20px;
+            padding: 24px 20px 16px;
             color: white;
         }
         .sidebar-header .app-icon {
@@ -136,17 +136,17 @@
         .sidebar-header h2 { font-size: 1.1rem; font-weight: 800; }
         .sidebar-header p { font-size: 0.8rem; opacity: 0.8; margin-top: 3px; }
 
-        .sidebar-nav { padding: 12px 10px; flex: 1; }
+        .sidebar-nav { padding: 8px 10px; flex: 1; }
 
         .nav-item {
             display: flex;
             align-items: center;
             gap: 14px;
-            padding: 13px 14px;
+            padding: 12px 14px;
             border-radius: 12px;
             cursor: pointer;
             transition: background 0.2s;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
             border: none;
             background: transparent;
             width: 100%;
@@ -191,7 +191,7 @@
         .nav-divider {
             height: 1px;
             background: #f1f5f9;
-            margin: 8px 14px;
+            margin: 6px 14px;
         }
 
         /* ========== PAGES ========== */
@@ -641,7 +641,7 @@
             display: flex;
             align-items: center;
             gap: 14px;
-            padding: 11px 14px;
+            padding: 8px 14px;
             border-radius: 12px;
             cursor: pointer;
             width: 100%;
@@ -856,6 +856,62 @@
             color: var(--accent-color);
         }
 
+        /* ========== BITRATE CALCULATOR ========== */
+        .bitrate-group { margin-bottom: 18px; }
+        .bitrate-group .cons-label { text-align: right; margin-bottom: 8px; }
+        .bitrate-size-row { display: flex; gap: 10px; }
+        .bitrate-size-row .cons-input { flex: 1; }
+        .bitrate-unit-toggle {
+            width: 120px;
+            height: 42px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            background: #fff;
+            color: var(--text-main);
+            font-family: 'Tajawal', sans-serif;
+            cursor: pointer;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding-top: 3px;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+        .bitrate-unit-toggle:active { background: #f8fafc; }
+        .bitrate-time-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        .bitrate-time-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            align-items: center;
+        }
+        .bitrate-time-item .cons-input { text-align: center; width: 100%; }
+        .bitrate-time-label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+        .bitrate-result {
+            display: none;
+            margin-top: 22px;
+            background: linear-gradient(135deg, #eef2ff 0%, #f5f3ff 100%);
+            border-radius: 20px;
+            padding: 22px 18px 18px;
+            text-align: center;
+            animation: fadeIn 0.3s ease;
+            border: 1.5px solid #e0e7ff;
+        }
+        .bitrate-result .stream-result-label { margin-bottom: 20px; }
+        .bitrate-result .stream-result-value { padding-top: 0; line-height: 1.2; }
+        .bitrate-result .stream-result-sub { margin-top: 8px; }
+
     </style>
 </head>
 <body>
@@ -922,6 +978,20 @@
             <div class="nav-item-text">
                 <span class="nav-item-title">حاسبة البث المباشر</span>
                 <span class="nav-item-subtitle">استهلاك البث حسب المدة</span>
+            </div>
+        </button>
+
+        <div class="nav-divider"></div>
+
+        <button class="nav-item" id="nav-bitrate" onclick="navigateTo('bitrate')">
+            <div class="nav-item-icon">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                    <polyline points="22 12 18 12 15 20 9 4 6 12 2 12"/>
+                </svg>
+            </div>
+            <div class="nav-item-text">
+                <span class="nav-item-title">حاسبة معدل البت</span>
+                <span class="nav-item-subtitle">معدل البت للفيديو</span>
             </div>
         </button>
 
@@ -1411,6 +1481,44 @@
         document.getElementById('consError').classList.remove('show');
     }
 
+    // ========== BITRATE CALCULATOR ==========
+    let brUnit = 'MB';
+
+    function toggleBrUnit() {
+        if (brUnit === 'MB') {
+            brUnit = 'GB';
+            document.getElementById('brSizeUnitLabel').textContent = 'جيجابايت';
+        } else {
+            brUnit = 'MB';
+            document.getElementById('brSizeUnitLabel').textContent = 'ميجابايت';
+        }
+    }
+
+    function calculateBitrate() {
+        const size = parseFloat(document.getElementById('brFileSize').value) || 0;
+        const unit = brUnit;
+        const hours   = parseInt(document.getElementById('brHours').value)   || 0;
+        const minutes = parseInt(document.getElementById('brMinutes').value) || 0;
+        const seconds = parseInt(document.getElementById('brSeconds').value) || 0;
+
+        const totalSeconds = (hours * 3600) + (minutes * 60) + seconds;
+        const resultEl = document.getElementById('brResult');
+
+        if (size === 0 || totalSeconds === 0) {
+            resultEl.style.display = 'none';
+            return;
+        }
+
+        const sizeInMB     = unit === 'GB' ? size * 1024 : size;
+        const sizeInKbits  = sizeInMB * 8192;
+        const bitrateKbps  = sizeInKbits / totalSeconds;
+        const bitrateMbps  = bitrateKbps / 1000;
+
+        document.getElementById('brKbps').textContent = Math.round(bitrateKbps);
+        document.getElementById('brMbps').textContent = bitrateMbps.toFixed(2);
+        resultEl.style.display = 'block';
+    }
+
     function calculateConsumption() {
         const capInput      = document.getElementById('capacity').value;
         const remInput      = document.getElementById('remaining').value;
@@ -1596,6 +1704,58 @@
             </span>
             <div class="stream-result-sub">
                 <div class="stream-sub-pill">السرعة: <b id="streamResultSpeed" style="direction:ltr;display:inline-block;">—</b></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===================== PAGE: BITRATE CALCULATOR ===================== -->
+<div id="page-bitrate" class="page">
+    <div class="cons-card">
+        <div class="card-header">
+            <div class="header-spacer"></div>
+            <h1>حاسبة معدل البت</h1>
+            <button class="menu-btn" onclick="openSidebar()"><span></span><span></span><span></span></button>
+        </div>
+
+        <div class="bitrate-group">
+            <label class="cons-label">حجم الملف</label>
+            <div class="bitrate-size-row">
+                <input class="cons-input" type="number" id="brFileSize" inputmode="decimal" step="any" min="0">
+                <button type="button" class="bitrate-unit-toggle" onclick="toggleBrUnit()">
+                    <span id="brSizeUnitLabel">ميجابايت</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="bitrate-group">
+            <label class="cons-label">مدة الفيديو</label>
+            <div class="bitrate-time-grid">
+                <div class="bitrate-time-item">
+                    <input class="cons-input" type="number" id="brSeconds" inputmode="numeric" min="0" max="59">
+                    <span class="bitrate-time-label">ثواني</span>
+                </div>
+                <div class="bitrate-time-item">
+                    <input class="cons-input" type="number" id="brMinutes" inputmode="numeric" min="0" max="59">
+                    <span class="bitrate-time-label">دقائق</span>
+                </div>
+                <div class="bitrate-time-item">
+                    <input class="cons-input" type="number" id="brHours" inputmode="numeric" min="0">
+                    <span class="bitrate-time-label">ساعات</span>
+                </div>
+            </div>
+        </div>
+
+        <button class="cons-btn" onclick="calculateBitrate()">احسب معدل البت</button>
+
+        <div class="bitrate-result" id="brResult">
+            <span class="stream-result-label">معدل البت المقدر</span>
+            <span class="stream-result-number-line">
+                <span class="stream-result-value" id="brKbps">0</span>
+                <span class="stream-result-unit">kbps</span>
+            </span>
+            <div class="stream-result-sub">
+                <div class="stream-sub-pill">Mbps <b id="brMbps" style="direction:ltr;display:inline-block;">0.00</b></div>
             </div>
         </div>
     </div>
