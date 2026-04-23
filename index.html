@@ -198,7 +198,7 @@
         .page { display: none; padding: 0.6cm 13px 50px; }
         .page.active { display: block; }
         @media (display-mode: standalone) {
-            body:has(#page-consumption.active) { overflow: hidden; }
+            body:has(#page-usage.active) { overflow: hidden; }
             body:has(#page-speed.active) { overflow: hidden; }
             body:has(#page-speed.active #result[style*="flex"]) { overflow: auto; }
         }
@@ -936,7 +936,7 @@
     </div>
 
     <div class="sidebar-nav">
-        <button class="nav-item active-nav" id="nav-consumption" onclick="navigateTo('consumption')">
+        <button class="nav-item active-nav" id="nav-usage" onclick="navigateTo('usage')">
             <div class="nav-item-icon">
                 <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <line x1="18" y1="20" x2="18" y2="10"></line>
@@ -1207,7 +1207,7 @@
 </div>
 
 <!-- ===================== PAGE: CONSUMPTION RATE ===================== -->
-<div id="page-consumption" class="page active">
+<div id="page-usage" class="page active">
 
     <div class="cons-card">
         <div class="card-header">
@@ -1406,7 +1406,15 @@
 
         closeSidebar();
         window.scrollTo({ top: 0, behavior: 'smooth' });
+        history.replaceState(null, '', '#' + page);
     }
+
+    // Navigate to hash on load
+    const validPages = ['usage', 'speed', 'streaming', 'bitrate'];
+    document.addEventListener('DOMContentLoaded', function() {
+        const hash = location.hash.replace('#', '');
+        if (validPages.includes(hash)) navigateTo(hash);
+    });
 
     // ========== SPEED CALCULATOR ==========
     function updateValue(id, change) {
