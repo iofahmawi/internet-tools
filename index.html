@@ -470,47 +470,66 @@
             display: none;
             margin-top: 20px;
             animation: fadeIn 0.3s ease;
+            background: linear-gradient(to bottom, #ffffff, #f8fafc);
+            border: 2px solid #eef2ff;
+            border-radius: 20px;
+            padding: 18px 20px;
+            text-align: center;
         }
 
         .cons-main-result {
             text-align: center;
-            margin-bottom: 12px;
-            padding: 16px 15px 10px;
-            background: #eef2ff;
-            border-radius: 14px;
+            margin-bottom: 10px;
+            padding: 0;
+            background: transparent;
+            border-radius: 0;
         }
         .cons-main-label {
             display: block;
             color: var(--text-secondary);
-            font-size: 0.85rem;
-            margin-bottom: 6px;
+            font-size: 0.88rem;
+            margin-bottom: 16px;
         }
         .cons-main-value {
             display: block;
-            color: var(--accent-color);
-            font-size: 2rem;
+            font-size: 3rem;
             font-weight: 800;
             direction: ltr;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .cons-stats {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
+            gap: 10px;
+            margin-top: 8px;
         }
 
         .cons-stat-item {
-            background: #f8fafc;
-            padding: 14px 12px;
-            border-radius: 12px;
-            border: 1px solid #e5e7eb;
+            background: white;
+            border: 1px solid #e0e7ff;
+            border-radius: 14px;
+            padding: 12px 10px;
             text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            gap: 2px;
         }
         .cons-stat-label {
-            font-size: 0.85rem;
+            font-size: 0.82rem;
+            font-weight: 700;
             color: var(--text-secondary);
             display: block;
-            margin-bottom: 8px;
+            min-height: 2.2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            line-height: 1.3;
         }
         .cons-stat-value {
             font-size: 1.05rem;
@@ -1280,7 +1299,7 @@
                 <span class="cons-stat-value" id="luxuryStatus"></span>
             </div>
             <div class="cons-stat-item">
-                <span class="cons-stat-label">المعدل الآمن للمتبقي</span>
+                <span class="cons-stat-label">المعدل للمتبقي</span>
                 <span class="cons-stat-value" id="safeRate"></span>
             </div>
         </div>
@@ -1566,12 +1585,10 @@
         const d = Math.floor(totalMinutes / 1440);
         const h = Math.floor((totalMinutes % 1440) / 60);
         const m = totalMinutes % 60;
-        const dayWord  = d >= 3 && d <= 10 ? 'أيام' : 'يوم';
-        const s = 'font-size:0.95rem';
-        const daysLabel = d + ' <span style="'+s+'">' + dayWord + '</span>';
+        const daysLabel = d;
 
         document.getElementById('actualDailyRate').innerText = actualDailyRate.toFixed(2) + " GB";
-        document.getElementById('daysPassed').innerHTML     = daysLabel.trim();
+        document.getElementById('daysPassed').innerText     = daysLabel;
         document.getElementById('consumed').innerText       = consumed.toFixed(2) + " GB";
         document.getElementById('safeRate').innerText       = safeRate.toFixed(2) + " GB";
 
@@ -1633,7 +1650,7 @@
 
         let displayValue, displayUnit;
         if (gbRaw < 1) {
-            displayValue = (gbRaw * 1000).toFixed(0);
+            displayValue = (gbRaw * 1000).toFixed(2);
             displayUnit  = 'MB';
         } else {
             displayValue = gbRaw.toFixed(2);
