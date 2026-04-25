@@ -1295,7 +1295,7 @@
                 <span class="cons-stat-value" id="consumed"></span>
             </div>
             <div class="cons-stat-item" id="luxuryStatusCard">
-                <span class="cons-stat-label">حالة الرفاهية</span>
+                <span class="cons-stat-label">حالة الاستخدام</span>
                 <span class="cons-stat-value" id="luxuryStatus"></span>
             </div>
             <div class="cons-stat-item">
@@ -1592,18 +1592,18 @@
         document.getElementById('consumed').innerText       = consumed.toFixed(2) + " GB";
         document.getElementById('safeRate').innerText       = safeRate.toFixed(2) + " GB";
 
-        // ===== حالة الرفاهية =====
+        // ===== حالة الاستخدام =====
         const luxuryCard = document.getElementById('luxuryStatusCard');
         const luxuryEl   = document.getElementById('luxuryStatus');
 
         if (safeRate < actualDailyRate) {
-            luxuryEl.innerHTML = '<span style="font-size:0.95rem">حذر</span>';
+            luxuryEl.innerHTML = '<span style="font-size:0.95rem;position:relative;top:-2px">خطر</span>';
         } else if (safeRate < 2 * actualDailyRate) {
             const daysToLuxury = Math.ceil(2 * daysLeft - rem / actualDailyRate);
             const dtWord = daysToLuxury >= 3 && daysToLuxury <= 10 ? 'أيام' : 'يوم';
             luxuryEl.innerHTML = daysToLuxury + ' <span style="font-size:0.95rem">' + dtWord + '</span>';
         } else {
-            luxuryEl.innerHTML = '<span style="font-size:0.95rem">رفاهية</span>';
+            luxuryEl.innerHTML = '<span style="font-size:0.95rem;position:relative;top:-2px">وفير</span>';
         }
 
         const resultEl = document.getElementById('consResult');
