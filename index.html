@@ -136,13 +136,13 @@
         .sidebar-header h2 { font-size: 1.1rem; font-weight: 800; }
         .sidebar-header p { font-size: 0.8rem; opacity: 0.8; margin-top: 3px; }
 
-        .sidebar-nav { padding: 8px 10px; flex: 1; }
+        .sidebar-nav { padding: 6px 10px; }
 
         .nav-item {
             display: flex;
             align-items: center;
             gap: 14px;
-            padding: 12px 14px;
+            padding: 11px 14px;
             border-radius: 12px;
             cursor: pointer;
             transition: background 0.2s;
@@ -159,8 +159,8 @@
         }
 
         .nav-item-icon {
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             border-radius: 10px;
             background: #f1f5f9;
             display: flex;
@@ -655,7 +655,7 @@
             display: flex;
             align-items: center;
             gap: 14px;
-            padding: 8px 14px;
+            padding: 11px 14px;
             border-radius: 12px;
             cursor: pointer;
             width: 100%;
@@ -668,8 +668,8 @@
         }
         .sidebar-action-btn:active { background: #f1f5f9; }
         .sidebar-action-btn .sab-icon {
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             border-radius: 10px;
             background: #f1f5f9;
             color: var(--text-secondary);
@@ -927,6 +927,106 @@
         .bitrate-result .stream-result-value { padding-top: 0; line-height: 1.2; font-size: 3rem; }
         .bitrate-result .stream-result-sub { margin-top: 8px; }
 
+        /* ========== SPEED TEST ========== */
+        .spt-gauge-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 14px 0 6px;
+        }
+        .spt-gauge {
+            position: relative;
+            width: 170px;
+            height: 170px;
+        }
+        .spt-gauge svg {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+        .spt-track {
+            fill: none;
+            stroke: #f1f5f9;
+            stroke-width: 12;
+        }
+        .spt-arc {
+            fill: none;
+            stroke: url(#sptGrad);
+            stroke-width: 12;
+            stroke-linecap: round;
+            stroke-dasharray: 452.4;
+            stroke-dashoffset: 452.4;
+            transition: stroke-dashoffset 0.5s ease;
+        }
+        .spt-center {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+        }
+        .spt-val {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1;
+            direction: ltr;
+        }
+        .spt-unit-lbl {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+        .spt-status-txt {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            margin-top: 14px;
+            text-align: center;
+            min-height: 1.3em;
+        }
+        .spt-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 22px;
+        }
+        .spt-metric {
+            background: white;
+            border: 1px solid #e0e7ff;
+            border-radius: 14px;
+            padding: 13px 8px 11px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+        .spt-metric-label {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            display: block;
+        }
+        .spt-metric-val {
+            margin-top: 6px;
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--accent-color);
+            direction: ltr;
+            display: block;
+            line-height: 1;
+        }
+        .spt-metric-unit {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #94a3b8;
+        }
+
     </style>
 </head>
 <body>
@@ -975,6 +1075,22 @@
             <div class="nav-item-text">
                 <span class="nav-item-title">حاسبة السرعة</span>
                 <span class="nav-item-subtitle">السرعة المناسبة لاشتراكك</span>
+            </div>
+        </button>
+
+        <div class="nav-divider"></div>
+
+        <button class="nav-item" id="nav-speedtest" onclick="navigateTo('speedtest')">
+            <div class="nav-item-icon">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M3 17a9 9 0 0 1 18 0" stroke-linecap="round"/>
+                    <line x1="12" y1="17" x2="17" y2="10" stroke-linecap="round"/>
+                    <circle cx="12" cy="17" r="1.5" fill="currentColor" stroke="none"/>
+                </svg>
+            </div>
+            <div class="nav-item-text">
+                <span class="nav-item-title">قياس السرعة</span>
+                <span class="nav-item-subtitle">اختبر سرعة اتصالك الآن</span>
             </div>
         </button>
 
@@ -1424,11 +1540,112 @@
     }
 
     // Navigate to hash on load
-    const validPages = ['usage', 'speed', 'streaming', 'bitrate'];
+    const validPages = ['usage', 'speed', 'speedtest', 'streaming', 'bitrate'];
     document.addEventListener('DOMContentLoaded', function() {
         const hash = location.hash.replace('#', '');
         if (validPages.includes(hash)) navigateTo(hash);
     });
+
+    // ========== SPEED TEST ==========
+    let sptRunning = false;
+
+    async function runSpeedTest() {
+        if (sptRunning) return;
+        sptRunning = true;
+
+        const btn = document.getElementById('sptBtn');
+        btn.disabled = true;
+        btn.textContent = 'جاري الاختبار...';
+
+        setSptDisplay('—', '');
+        setSptStatus('جاهز...');
+        setSptArc(0);
+        ['sptPing','sptDown','sptUp'].forEach(id => document.getElementById(id).textContent = '—');
+
+        try {
+            setSptStatus('قياس الاستجابة...');
+            const ping = await sptMeasurePing();
+            document.getElementById('sptPing').textContent = ping;
+
+            setSptStatus('قياس التنزيل...');
+            const down = await sptMeasureDownload();
+            document.getElementById('sptDown').textContent = down;
+            setSptDisplay(down, 'Mbps');
+
+            setSptStatus('قياس الرفع...');
+            const up = await sptMeasureUpload();
+            document.getElementById('sptUp').textContent = up;
+
+            setSptDisplay(down, 'Mbps');
+            setSptArc(parseFloat(down) / 200);
+            setSptStatus('اكتمل الاختبار <span style="color:var(--accent-color)">✓</span>');
+        } catch(e) {
+            setSptStatus('تعذّر الاتصال، تحقق من اتصالك');
+            setSptDisplay('!', '');
+        }
+
+        btn.disabled = false;
+        btn.textContent = 'أعد الاختبار';
+        sptRunning = false;
+    }
+
+    async function sptMeasurePing() {
+        const times = [];
+        for (let i = 0; i < 5; i++) {
+            const t = Date.now();
+            await fetch('https://speed.cloudflare.com/__down?bytes=0', { cache: 'no-store' });
+            times.push(Date.now() - t);
+        }
+        return Math.min(...times);
+    }
+
+    async function sptMeasureDownload() {
+        const sizes = [100000, 1000000, 10000000, 25000000];
+        let totalBytes = 0, totalMs = 0;
+        for (const size of sizes) {
+            const t = Date.now();
+            const r = await fetch(`https://speed.cloudflare.com/__down?bytes=${size}`, { cache: 'no-store' });
+            await r.arrayBuffer();
+            const ms = Date.now() - t;
+            totalBytes += size;
+            totalMs += ms;
+            const mbps = ((totalBytes * 8) / (totalMs / 1000) / 1000000).toFixed(1);
+            setSptDisplay(mbps, 'Mbps');
+            setSptArc(parseFloat(mbps) / 200);
+        }
+        return ((totalBytes * 8) / (totalMs / 1000) / 1000000).toFixed(1);
+    }
+
+    async function sptMeasureUpload() {
+        const sizes = [200000, 2000000, 10000000];
+        let totalBytes = 0, totalMs = 0;
+        for (const size of sizes) {
+            const data = new Uint8Array(size);
+            const t = Date.now();
+            await fetch('https://speed.cloudflare.com/__up', {
+                method: 'POST', body: data, cache: 'no-store'
+            });
+            const ms = Date.now() - t;
+            totalBytes += size;
+            totalMs += ms;
+            const mbps = ((totalBytes * 8) / (totalMs / 1000) / 1000000).toFixed(1);
+            setSptDisplay(mbps, 'Mbps');
+            setSptArc(parseFloat(mbps) / 200);
+        }
+        return ((totalBytes * 8) / (totalMs / 1000) / 1000000).toFixed(1);
+    }
+
+    function setSptDisplay(val, unit) {
+        document.getElementById('sptCurrentValue').textContent = val;
+        document.getElementById('sptCurrentUnit').textContent = unit;
+    }
+    function setSptStatus(txt) {
+        document.getElementById('sptStatus').innerHTML = txt;
+    }
+    function setSptArc(pct) {
+        const circ = 452.4;
+        document.getElementById('sptArc').style.strokeDashoffset = circ * (1 - Math.min(pct, 1));
+    }
 
     // ========== SPEED CALCULATOR ==========
     function updateValue(id, change) {
@@ -1666,6 +1883,57 @@
         resultEl.style.display = 'block';
     }
 </script>
+
+<!-- ===================== PAGE: SPEED TEST ===================== -->
+<div id="page-speedtest" class="page">
+    <div class="cons-card">
+        <div class="card-header">
+            <div class="header-spacer"></div>
+            <h1>قياس السرعة</h1>
+            <button class="menu-btn" onclick="openSidebar()"><span></span><span></span><span></span></button>
+        </div>
+
+        <div class="spt-gauge-wrap">
+            <div class="spt-gauge">
+                <svg viewBox="0 0 170 170">
+                    <defs>
+                        <linearGradient id="sptGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#4f46e5"/>
+                            <stop offset="100%" stop-color="#7c3aed"/>
+                        </linearGradient>
+                    </defs>
+                    <circle class="spt-track" cx="85" cy="85" r="72"/>
+                    <circle class="spt-arc" id="sptArc" cx="85" cy="85" r="72"/>
+                </svg>
+                <div class="spt-center">
+                    <span class="spt-val" id="sptCurrentValue">—</span>
+                    <span class="spt-unit-lbl" id="sptCurrentUnit"></span>
+                </div>
+            </div>
+            <div class="spt-status-txt" id="sptStatus">جاهز للاختبار</div>
+        </div>
+
+        <div class="spt-metrics">
+            <div class="spt-metric">
+                <span class="spt-metric-label">التنزيل</span>
+                <span class="spt-metric-val" id="sptDown">—</span>
+                <span class="spt-metric-unit">Mbps</span>
+            </div>
+            <div class="spt-metric">
+                <span class="spt-metric-label">الرفع</span>
+                <span class="spt-metric-val" id="sptUp">—</span>
+                <span class="spt-metric-unit">Mbps</span>
+            </div>
+            <div class="spt-metric">
+                <span class="spt-metric-label">الاستجابة</span>
+                <span class="spt-metric-val" id="sptPing">—</span>
+                <span class="spt-metric-unit">ms</span>
+            </div>
+        </div>
+
+        <button class="cons-btn" id="sptBtn" onclick="runSpeedTest()">ابدأ الاختبار</button>
+    </div>
+</div>
 
 <!-- ===================== PAGE: STREAMING CALCULATOR ===================== -->
 <div id="page-streaming" class="page">
