@@ -988,6 +988,22 @@
             margin-top: 14px;
             text-align: center;
             min-height: 1.3em;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        .spt-status-txt.fade-update {
+            opacity: 0;
+            transform: translateY(-6px);
+        }
+        .spt-dot {
+            display: inline-block;
+            opacity: 0;
+            animation: sptDotBlink 1.2s infinite;
+        }
+        .spt-dot:nth-child(2) { animation-delay: 0.2s; }
+        .spt-dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes sptDotBlink {
+            0%, 80%, 100% { opacity: 0; }
+            40% { opacity: 1; }
         }
         .spt-metrics {
             display: grid;
@@ -1548,45 +1564,61 @@
 
     // ========== SPEED TEST ==========
     let sptRunning = false;
+    let sptAborted = false;
 
     async function runSpeedTest() {
-        if (sptRunning) return;
+        if (sptRunning) {
+            sptAborted = true;
+            return;
+        }
         sptRunning = true;
+        sptAborted = false;
 
         const btn = document.getElementById('sptBtn');
-        btn.disabled = true;
-        btn.textContent = 'جاري الاختبار...';
+        btn.disabled = false;
+        btn.textContent = 'إيقاف';
+        btn.onclick = () => { sptAborted = true; };
 
         setSptDisplay('—', '');
-        setSptStatus('جاهز...');
+        setSptStatus('جاهز' + dots());
         setSptArc(0);
         ['sptPing','sptDown','sptUp'].forEach(id => document.getElementById(id).textContent = '—');
 
         try {
-            setSptStatus('قياس الاستجابة...');
+            setSptStatus('قياس الاستجابة' + dots());
             const ping = await sptMeasurePing();
+            if (sptAborted) throw new Error('aborted');
             document.getElementById('sptPing').textContent = ping;
 
-            setSptStatus('قياس التنزيل...');
+            setSptStatus('قياس التنزيل' + dots());
             const down = await sptMeasureDownload();
+            if (sptAborted) throw new Error('aborted');
             document.getElementById('sptDown').textContent = down;
             setSptDisplay(down, 'Mbps');
 
-            setSptStatus('قياس الرفع...');
+            setSptStatus('قياس الرفع' + dots());
             const up = await sptMeasureUpload();
+            if (sptAborted) throw new Error('aborted');
             document.getElementById('sptUp').textContent = up;
 
             setSptDisplay(down, 'Mbps');
             setSptArc(parseFloat(down) / 200);
             setSptStatus('اكتمل الاختبار <span style="color:var(--accent-color)">✓</span>');
         } catch(e) {
-            setSptStatus('تعذّر الاتصال، تحقق من اتصالك');
-            setSptDisplay('!', '');
+            if (e.message === 'aborted') {
+                setSptStatus('تم إيقاف الاختبار');
+                setSptDisplay('—', '');
+                setSptArc(0);
+            } else {
+                setSptStatus('تعذّر الاتصال، تحقق من اتصالك');
+                setSptDisplay('!', '');
+            }
         }
 
-        btn.disabled = false;
-        btn.textContent = 'أعد الاختبار';
+        btn.textContent = 'ابدأ الاختبار';
+        btn.onclick = () => runSpeedTest();
         sptRunning = false;
+        sptAborted = false;
     }
 
     async function sptMeasurePing() {
@@ -1639,8 +1671,16 @@
         document.getElementById('sptCurrentValue').textContent = val;
         document.getElementById('sptCurrentUnit').textContent = unit;
     }
+    function dots() {
+        return '<span class="spt-dot">.</span><span class="spt-dot">.</span><span class="spt-dot">.</span>';
+    }
     function setSptStatus(txt) {
-        document.getElementById('sptStatus').innerHTML = txt;
+        const el = document.getElementById('sptStatus');
+        el.classList.add('fade-update');
+        setTimeout(() => {
+            el.innerHTML = txt;
+            el.classList.remove('fade-update');
+        }, 300);
     }
     function setSptArc(pct) {
         const circ = 452.4;
