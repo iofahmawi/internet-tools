@@ -972,7 +972,9 @@
             background: var(--primary-gradient);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            line-height: 1;
+            line-height: 1.2;
+            padding-top: 4px;
+            display: inline-block;
             direction: ltr;
         }
         .spt-unit-lbl {
@@ -1584,7 +1586,7 @@
         ['sptPing','sptDown','sptUp'].forEach(id => document.getElementById(id).textContent = '—');
 
         try {
-            setSptStatus('قياس الاستجابة' + dots());
+            setSptStatus('جاري الاختبار' + dots());
             const ping = await sptMeasurePing();
             if (sptAborted) throw new Error('aborted');
             document.getElementById('sptPing').textContent = ping;
@@ -1602,7 +1604,7 @@
 
             setSptDisplay(down, 'Mbps');
             setSptArc(parseFloat(down) / 200);
-            setSptStatus('اكتمل الاختبار <span style="color:var(--accent-color)">✓</span>');
+            setSptStatus('اكتمل الاختبار <span style="display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;background:var(--accent-color);border-radius:50%;vertical-align:middle;position:relative;top:-1px;margin-right:4.5px"><svg width="8" height="8" viewBox="0 0 10 10" fill="none"><polyline points="2,5 4,7.5 8,3" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>');
         } catch(e) {
             if (e.message === 'aborted') {
                 setSptStatus('تم إيقاف الاختبار');
