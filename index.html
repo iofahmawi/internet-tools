@@ -66,10 +66,8 @@
             border: none;
             border-radius: 10px;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 4px;
             cursor: pointer;
             padding: 0;
             flex-shrink: 0;
@@ -78,13 +76,6 @@
             top: -5px;
         }
         .menu-btn:active { background: #e2e8f0; }
-        .menu-btn span {
-            display: block;
-            width: 16px;
-            height: 2px;
-            background: var(--accent-color);
-            border-radius: 2px;
-        }
 
         /* ========== SIDEBAR ========== */
         .sidebar-overlay {
@@ -1022,6 +1013,27 @@
             flex-direction: column;
             align-items: center;
             gap: 5px;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        .spt-metric:active { border-color: var(--accent-color); }
+        .spt-data-row {
+            display: none;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .spt-data-row.visible { display: grid; }
+        .spt-data-card {
+            background: white;
+            border: 1px solid #e0e7ff;
+            border-radius: 14px;
+            padding: 13px 8px 11px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
         }
         .spt-metric-label {
             font-size: 0.78rem;
@@ -1090,7 +1102,7 @@
                 </svg>
             </div>
             <div class="nav-item-text">
-                <span class="nav-item-title">حاسبة السرعة</span>
+                <span class="nav-item-title">السرعة المناسبة</span>
                 <span class="nav-item-subtitle">السرعة المناسبة لاشتراكك</span>
             </div>
         </button>
@@ -1211,8 +1223,8 @@
 
         <div class="card-header">
             <div class="header-spacer"></div>
-            <h1>حاسبة السرعة</h1>
-            <button class="menu-btn" onclick="openSidebar()"><span></span><span></span><span></span></button>
+            <h1>السرعة المناسبة</h1>
+            <button class="menu-btn" onclick="openSidebar()"><svg width="16" height="12" viewBox="0 0 16 14" fill="none"><line x1="0" y1="2" x2="16" y2="2" stroke="#4f46e5" stroke-width="2" stroke-linecap="round"/><line x1="0" y1="7" x2="16" y2="7" stroke="#4f46e5" stroke-width="2" stroke-linecap="round"/><line x1="0" y1="12" x2="16" y2="12" stroke="#4f46e5" stroke-width="2" stroke-linecap="round"/></svg></button>
         </div>
 
         <div class="section-title">الشاشات والمشاهدة</div>
@@ -1360,7 +1372,7 @@
         <div class="card-header">
             <div class="header-spacer"></div>
             <h1>معدل الاستهلاك</h1>
-            <button class="menu-btn" onclick="openSidebar()"><span></span><span></span><span></span></button>
+            <button class="menu-btn" onclick="openSidebar()"><svg width="16" height="12" viewBox="0 0 16 14" fill="none"><line x1="0" y1="2" x2="16" y2="2" stroke="#4f46e5" stroke-width="2" stroke-linecap="round"/><line x1="0" y1="7" x2="16" y2="7" stroke="#4f46e5" stroke-width="2" stroke-linecap="round"/><line x1="0" y1="12" x2="16" y2="12" stroke="#4f46e5" stroke-width="2" stroke-linecap="round"/></svg></button>
         </div>
         <div class="cons-row">
             <div class="cons-group">
@@ -1566,6 +1578,14 @@
     // ========== SPEED TEST ==========
     let sptRunning = false;
     let sptAborted = false;
+    let sptTotalDownBytes = 0;
+    let sptTotalUpBytes = 0;
+
+    function toggleSptData() {
+        const row = document.getElementById('sptDataRow');
+        if (sptTotalDownBytes === 0 && sptTotalUpBytes === 0) return;
+        row.classList.toggle('visible');
+    }
 
     async function runSpeedTest() {
         if (sptRunning) {
@@ -1584,6 +1604,9 @@
         setSptStatus('جاهز' + dots());
         setSptArc(0);
         ['sptPing','sptDown','sptUp'].forEach(id => document.getElementById(id).textContent = '—');
+        document.getElementById('sptDataRow').classList.remove('visible');
+        sptTotalDownBytes = 0;
+        sptTotalUpBytes = 0;
 
         try {
             setSptStatus('جاري الاختبار' + dots());
@@ -1633,39 +1656,47 @@
     }
 
     async function sptMeasureDownload() {
-        const sizes = [100000, 1000000, 10000000, 25000000];
-        let totalBytes = 0, totalMs = 0;
-        for (const size of sizes) {
-            const t = Date.now();
-            const r = await fetch(`https://speed.cloudflare.com/__down?bytes=${size}`, { cache: 'no-store' });
+        const DURATION = 15000;
+        const CHUNK = 5000000;
+        let totalBytes = 0;
+        const start = Date.now();
+        while (Date.now() - start < DURATION) {
+            if (sptAborted) break;
+            const r = await fetch(`https://speed.cloudflare.com/__down?bytes=${CHUNK}`, { cache: 'no-store' });
             await r.arrayBuffer();
-            const ms = Date.now() - t;
-            totalBytes += size;
-            totalMs += ms;
-            const mbps = ((totalBytes * 8) / (totalMs / 1000) / 1000000).toFixed(1);
+            totalBytes += CHUNK;
+            const elapsed = (Date.now() - start) / 1000;
+            const mbps = ((totalBytes * 8) / elapsed / 1000000).toFixed(1);
             setSptDisplay(mbps, 'Mbps');
             setSptArc(parseFloat(mbps) / 200);
         }
-        return ((totalBytes * 8) / (totalMs / 1000) / 1000000).toFixed(1);
+        sptTotalDownBytes = totalBytes;
+        document.getElementById('sptDownBytes').textContent = (totalBytes / 1000000).toFixed(1);
+        const elapsed = (Date.now() - start) / 1000;
+        return ((totalBytes * 8) / elapsed / 1000000).toFixed(1);
     }
 
     async function sptMeasureUpload() {
-        const sizes = [200000, 2000000, 10000000];
-        let totalBytes = 0, totalMs = 0;
-        for (const size of sizes) {
-            const data = new Uint8Array(size);
-            const t = Date.now();
+        const DURATION = 15000;
+        const CHUNK = 5000000;
+        let totalBytes = 0;
+        const start = Date.now();
+        while (Date.now() - start < DURATION) {
+            if (sptAborted) break;
+            const data = new Uint8Array(CHUNK);
             await fetch('https://speed.cloudflare.com/__up', {
                 method: 'POST', body: data, cache: 'no-store'
             });
-            const ms = Date.now() - t;
-            totalBytes += size;
-            totalMs += ms;
-            const mbps = ((totalBytes * 8) / (totalMs / 1000) / 1000000).toFixed(1);
+            totalBytes += CHUNK;
+            const elapsed = (Date.now() - start) / 1000;
+            const mbps = ((totalBytes * 8) / elapsed / 1000000).toFixed(1);
             setSptDisplay(mbps, 'Mbps');
             setSptArc(parseFloat(mbps) / 200);
         }
-        return ((totalBytes * 8) / (totalMs / 1000) / 1000000).toFixed(1);
+        sptTotalUpBytes = totalBytes;
+        document.getElementById('sptUpBytes').textContent = (totalBytes / 1000000).toFixed(1);
+        const elapsed = (Date.now() - start) / 1000;
+        return ((totalBytes * 8) / elapsed / 1000000).toFixed(1);
     }
 
     function setSptDisplay(val, unit) {
@@ -1931,7 +1962,7 @@
         <div class="card-header">
             <div class="header-spacer"></div>
             <h1>قياس السرعة</h1>
-            <button class="menu-btn" onclick="openSidebar()"><span></span><span></span><span></span></button>
+            <button class="menu-btn" onclick="openSidebar()"><svg width="16" height="12" viewBox="0 0 16 14" fill="none"><line x1="0" y1="2" x2="16" y2="2" stroke="#4f46e5" stroke-width="2" stroke-linecap="round"/><line x1="0" y1="7" x2="16" y2="7" stroke="#4f46e5" stroke-width="2" stroke-linecap="round"/><line x1="0" y1="12" x2="16" y2="12" stroke="#4f46e5" stroke-width="2" stroke-linecap="round"/></svg></button>
         </div>
 
         <div class="spt-gauge-wrap">
@@ -1954,7 +1985,7 @@
             <div class="spt-status-txt" id="sptStatus">جاهز للاختبار</div>
         </div>
 
-        <div class="spt-metrics">
+        <div class="spt-metrics" onclick="toggleSptData()">
             <div class="spt-metric">
                 <span class="spt-metric-label">التنزيل</span>
                 <span class="spt-metric-val" id="sptDown">—</span>
@@ -1972,6 +2003,19 @@
             </div>
         </div>
 
+        <div class="spt-data-row" id="sptDataRow">
+            <div class="spt-metric">
+                <span class="spt-metric-label">حجم التنزيل</span>
+                <span class="spt-metric-val" id="sptDownBytes">—</span>
+                <span class="spt-metric-unit">MB</span>
+            </div>
+            <div class="spt-metric">
+                <span class="spt-metric-label">حجم الرفع</span>
+                <span class="spt-metric-val" id="sptUpBytes">—</span>
+                <span class="spt-metric-unit">MB</span>
+            </div>
+        </div>
+
         <button class="cons-btn" id="sptBtn" onclick="runSpeedTest()">ابدأ الاختبار</button>
     </div>
 </div>
@@ -1982,7 +2026,7 @@
         <div class="card-header">
             <div class="header-spacer"></div>
             <h1>حاسبة البث المباشر</h1>
-            <button class="menu-btn" onclick="openSidebar()"><span></span><span></span><span></span></button>
+            <button class="menu-btn" onclick="openSidebar()"><svg width="16" height="12" viewBox="0 0 16 14" fill="none"><line x1="0" y1="2" x2="16" y2="2" stroke="#4f46e5" stroke-width="2" stroke-linecap="round"/><line x1="0" y1="7" x2="16" y2="7" stroke="#4f46e5" stroke-width="2" stroke-linecap="round"/><line x1="0" y1="12" x2="16" y2="12" stroke="#4f46e5" stroke-width="2" stroke-linecap="round"/></svg></button>
         </div>
 
         <div class="stream-input-group">
@@ -2043,7 +2087,7 @@
         <div class="card-header">
             <div class="header-spacer"></div>
             <h1>حاسبة معدل البت</h1>
-            <button class="menu-btn" onclick="openSidebar()"><span></span><span></span><span></span></button>
+            <button class="menu-btn" onclick="openSidebar()"><svg width="16" height="12" viewBox="0 0 16 14" fill="none"><line x1="0" y1="2" x2="16" y2="2" stroke="#4f46e5" stroke-width="2" stroke-linecap="round"/><line x1="0" y1="7" x2="16" y2="7" stroke="#4f46e5" stroke-width="2" stroke-linecap="round"/><line x1="0" y1="12" x2="16" y2="12" stroke="#4f46e5" stroke-width="2" stroke-linecap="round"/></svg></button>
         </div>
 
         <div class="bitrate-group">
