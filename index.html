@@ -1019,7 +1019,7 @@
         .spt-metric:active { border-color: var(--accent-color); }
         .spt-data-row {
             display: none;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(3, 1fr);
             gap: 10px;
             margin-top: 10px;
         }
@@ -1607,6 +1607,7 @@
         document.getElementById('sptDataRow').classList.remove('visible');
         sptTotalDownBytes = 0;
         sptTotalUpBytes = 0;
+        document.getElementById('sptJitter').textContent = '—';
 
         try {
             setSptStatus('جاري الاختبار' + dots());
@@ -1647,11 +1648,17 @@
 
     async function sptMeasurePing() {
         const times = [];
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < 8; i++) {
             const t = Date.now();
             await fetch('https://speed.cloudflare.com/__down?bytes=0', { cache: 'no-store' });
             times.push(Date.now() - t);
         }
+        const diffs = [];
+        for (let i = 1; i < times.length; i++) {
+            diffs.push(Math.abs(times[i] - times[i - 1]));
+        }
+        const jitter = (diffs.reduce((a, b) => a + b, 0) / diffs.length).toFixed(0);
+        document.getElementById('sptJitter').textContent = jitter;
         return Math.min(...times);
     }
 
@@ -2005,14 +2012,19 @@
 
         <div class="spt-data-row" id="sptDataRow">
             <div class="spt-metric">
-                <span class="spt-metric-label">حجم التنزيل</span>
+                <span class="spt-metric-label">التنزيل</span>
                 <span class="spt-metric-val" id="sptDownBytes">—</span>
                 <span class="spt-metric-unit">MB</span>
             </div>
             <div class="spt-metric">
-                <span class="spt-metric-label">حجم الرفع</span>
+                <span class="spt-metric-label">الرفع</span>
                 <span class="spt-metric-val" id="sptUpBytes">—</span>
                 <span class="spt-metric-unit">MB</span>
+            </div>
+            <div class="spt-metric">
+                <span class="spt-metric-label">التذبذب</span>
+                <span class="spt-metric-val" id="sptJitter">—</span>
+                <span class="spt-metric-unit">ms</span>
             </div>
         </div>
 
